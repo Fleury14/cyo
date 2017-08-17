@@ -23,6 +23,22 @@ body {
   justify-content: space-around;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
+.game {
+  font-family: 'Game';
+}
+
+.dos {
+  font-family: 'DOS';
+}
+
+.auto-center {
+  margin: 0 auto;
+}
+
 /* End Global, Begin header styles */
 
 .life-box {
@@ -36,6 +52,20 @@ body {
 
 #life-bar {
   color: #ff0000;
+
+}
+
+.dead-text {
+  color: #f00;
+  animation-name: dead-text-anim;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes dead-text-anim {
+  0% {color: #f00;}
+  50% {color: #fff;}
+  100% {color: #f00;}
 
 }
 
@@ -58,6 +88,10 @@ body {
   color: #fff;
 }
 
+#console-button-row {
+  margin-top: 2em;
+}
+
 .first-button {
   border: 1px solid #f00;
   color: #f00;
@@ -71,6 +105,6 @@ body {
   background-color: #444;
 }
 
-.first-butonn:active {
+.first-button:active {
   background-color: #666;
 }

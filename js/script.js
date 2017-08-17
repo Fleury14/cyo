@@ -8,6 +8,8 @@ let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created 
 
 let insertedElement = '';
 let elementTarget = '';
+let outputText = '';
+let textTimer = '';
 
 
 drawHealthBar();
@@ -19,6 +21,7 @@ function drawHealthBar() { // Function to refresh the health bar
   if (playerHealth === 0) { // if health = 0, uh oh
 
   lifeBar.innerHTML = 'DANGER';
+  lifeBar.setAttribute('class', 'text-warning');
 
   } else { // otherwise draw health as usual
 
@@ -61,7 +64,21 @@ function beginGame() {
 function decision11() {
 // player correctly chose to enter the door
 
-gameConsole.innerHTML = 'Correct decision';
+gameConsole.innerHTML = '';
+
+  outputText = 'As you go through the door, you find yourself sitting in a classroom. There are approximately 20 seats, but yours is the only one occupied. The walls are a deep blue, and you notice a couple of posters with text on them, but as you try to read it the text is incomprehensible. Before you can observe anything else in the room, your focus is immediately on the teachers desk which is occupied by a strange looking man.';
+  appendOutputConsole('p', outputText);
+  outputText = 'This \"teacher\" is wearing a black tuxedo with a white undershirt and a white hankerchief in his front pocket. He looks awfully thin, almost frail. His hair is a light grey, and only along the outside of his head as the top of his head is bald. His eyebrows seem unnecessarily long, and his eyes are almost completely circular in shape. His ears are pointed and his nose... extends at least 4 inches from his face. All of this conveys the look of an older man, but as he speaks to you, he does so in a voice that is both inquisitive and strangely upbeat, almost as if he anticipated your arrival:'
+  appendOutputConsole('p', outputText);
+
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision11A()">Continue</button>', 'flex-container justify-center');
+
+}
+
+function decision11A() {
+
+  gameConsole.innerHTML = '';
+  appendOutputConsole('p', 'Hello!');
 
 }
 
@@ -69,8 +86,64 @@ function decision12() {
 // Player chose to not go through the door. peanlty is one life. failure to answer correctly will result in instant death
 
 playerHealth--;
-drawHealthBar();
+drawHealthBar(); //Remove 1 health and redraw health bar
 
+//text
 gameConsole.innerHTML = 'You decide that floating doors are a little to weird for you and turn your attention to the world around you. As you leave the room you are in, you hear a rumbling sound approaching. Before you have time to react, a greyish floating blob appears before you with a mask attached that has the letters II attached to its forehead. It rapidly approaches you and as you brace yourself it passes right through you. There is a small pain felt, but more importantly than that you feel far more tired than before. That cannot happen again. You immediately retreat to find the blue door still there, this time emitting a small hum. Whatever that blob thing was, it is sure to return.';
 
+insertedElement = document.createElement('div'); // create button row
+insertedElement.setAttribute('class', 'flex-container justify-space-around');
+insertedElement.setAttribute('id', 'console-button-row');
+gameConsole.appendChild(insertedElement);
+
+consoleButtonRow = document.getElementById('console-button-row'); // make the newly created buttonrow a var that we can manipulate
+insertedElement = document.createElement('button'); //insert first button
+insertedElement.setAttribute('class', 'btn btn-primary');
+insertedElement.setAttribute('onclick', 'decision11()');
+insertedElement.innerHTML = 'Enter the door, for real';
+consoleButtonRow.appendChild(insertedElement);
+
+insertedElement = document.createElement('button'); // insert second button
+insertedElement.setAttribute('class', 'btn btn-danger');
+insertedElement.setAttribute('onclick', 'decision13()');
+insertedElement.innerHTML = 'Screw this, flee the premises!';
+consoleButtonRow.appendChild(insertedElement);
+
+insertedElement = document.createElement('p'); // create -1 health notice and remove after 3 seconds
+insertedElement.setAttribute('class', 'game text-center');
+insertedElement.setAttribute('id', 'health-notice');
+insertedElement.innerHTML = '-1 HEALTH';
+gameConsole.appendChild(insertedElement);
+textTimer = setTimeout(function(){ document.getElementById('health-notice').innerHTML="" }, 3000);
+
+
+} // end decision12()
+
+function decision13() {
+  // Player was given two chances to enter the door and refused both times. Game will now end
+
+clearTimeout(textTimer);
+
+lifeBar.innerHTML = '-DEAD-';
+lifeBar.setAttribute('class', 'dead-text');
+
+gameConsole.innerHTML = '';
+
+outputText = 'First floating doors, now giant blobs? \"No thanks.\", you think as you sprint outside as fast as you can. As you do so, the rumbling intensifies, only increasing your desire to get out. When you arrive outside, the rumbling stops. As you catch your breath, you are at first thankful for the silence and then look around you and notice a different kind of silence. Everything outside seems normal, but there\'s no ambient sounds whatsoever. Cars, animals, the wind, nothing is making any sound. Where you expect to see people walking down the street or cars passing, there is nothing. It as if all life here has disappeared. \nThe eerieness of such a view has taken so much of your attention that you don\'t notice the blob behind you, and this time it brought friends. They all pass through you from behind this time, and the fatigue from before is now overwhelming. As you begin to lose consciousness, you hear a faint voice. You can only make out two words: \"How disappointing\".'
+
+appendOutputConsole('p', outputText, '', '');
+appendOutputConsole('p', '\nYou never saw it coming, and it was most definitely your last surprise', '', '');
+
+appendOutputConsole('p', '*GAME OVER*', 'text-center game');
+appendOutputConsole('p', 'REFRESH TO TRY AGAIN', 'text-center game');
+
+}
+
+function appendOutputConsole(element, value, className, idName, onClick) {
+  insertedElement = document.createElement(element);
+  insertedElement.setAttribute('class', className);
+  insertedElement.setAttribute('id', idName);
+  insertedElement.setAttribute('onclick', onClick);
+  insertedElement.innerHTML = value;
+  gameConsole.appendChild(insertedElement);
 }
