@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Document</title>
+</head>
+<body>
+
+  <div class="container-fluid"> <!-- begin fluid container -->
+    <div class="row"> <!-- begin life bar row -->
+      <div class="col-sm-4 col-sm-offset-4 life-box text-center"> <!-- begin lifebar col -->
+        <p>-LIFE-</p>
+        <p id="life-bar">
+          <i class="fa fa-heart" aria-hidden="true"></i>
+          <i class="fa fa-heart" aria-hidden="true"></i>
+          <i class="fa fa-heart" aria-hidden="true"></i>
+        </p>
+      </div> <!-- end lifebar col -->
+    </div> <!-- end lifebar row -->
+    <div class="row"> <!-- begin middle row -->
+      <div class="col-sm-1"> <!-- begin left button area -->
+
+      </div> <!-- end left button area -->
+      <div class="col-sm-10 game-console" id="gameConsole"> <!-- begin main game console -->
+        <p id="intro-text">Welcome to a small adventure game. This is a class project in javascript. I hope you have as much fun playing this as I did making it. Please click the Start button to continue.</p>
+        <button id="intro-button" class="first-button" onclick="beginGame()">Click me to begin</button>
+      </div> <!-- end main game console -->
+      <div class="col-sm-1"><!-- begin right button area -->
+
+      </div><!-- end right button area -->
+    </div> <!-- end middle row -->
+  </div> <!-- end container fluid -->
+
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/script.js"></script>
+
+</body>
+</html>

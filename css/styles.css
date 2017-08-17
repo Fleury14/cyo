@@ -1,0 +1,76 @@
+@font-face {
+  font-family: 'Game';
+  src: url('../fonts/prstart.ttf');
+}
+
+@font-face {
+  font-family: 'DOS';
+  src: url('../fonts/LessPerfectDOSVGA.ttf');
+}
+
+/* Global styles */
+
+body {
+  margin: 0;
+  background-color: #000;
+}
+
+.flex-container {
+  display: flex;
+}
+
+.justify-space-around {
+  justify-content: space-around;
+}
+
+/* End Global, Begin header styles */
+
+.life-box {
+  height: 100px;
+  font-family: 'Game';
+  font-size: 24px;
+  color: #fff;
+
+  margin-bottom: 20px;
+}
+
+#life-bar {
+  color: #ff0000;
+
+}
+
+
+/* End header */
+
+/* Begin left container
+
+/* End left container */
+
+/* Begin right container */
+
+/* End right container */
+
+/* Begin middle console */
+
+.game-console {
+  font-family: 'DOS';
+  font-size: 1.5em;
+  color: #fff;
+}
+
+.first-button {
+  border: 1px solid #f00;
+  color: #f00;
+  background-color: #222;
+  border-radius: 5px;
+  font-family: 'Game';
+  margin: 1em auto;
+}
+
+.first-button:hover {
+  background-color: #444;
+}
+
+.first-butonn:active {
+  background-color: #666;
+}
