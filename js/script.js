@@ -11,6 +11,8 @@ let elementTarget = '';
 let outputText = '';
 let textTimer = '';
 
+document.getElementById('intro-button').addEventListener('click', beginGame);
+document.getElementById('intro-button').addEventListener('touch', beginGame);
 
 drawHealthBar();
 
@@ -68,7 +70,7 @@ gameConsole.innerHTML = '';
 
   outputText = 'As you go through the door, you find yourself sitting in a classroom. There are approximately 20 seats, but yours is the only one occupied. The walls are a deep blue, and you notice a couple of posters with text on them, but as you try to read it the text is incomprehensible. Before you can observe anything else in the room, your focus is immediately on the teachers desk which is occupied by a strange looking man.';
   appendOutputConsole('p', outputText);
-  outputText = 'This \"teacher\" is wearing a black tuxedo with a white undershirt and a white hankerchief in his front pocket. He looks awfully thin, almost frail. His hair is a light grey, and only along the outside of his head as the top of his head is bald. His eyebrows seem unnecessarily long, and his eyes are almost completely circular in shape. His ears are pointed and his nose... extends at least 4 inches from his face. All of this conveys the look of an older man, but as he speaks to you, he does so in a voice that is both inquisitive and strangely upbeat, almost as if he anticipated your arrival:'
+  outputText = 'This \"teacher\" is wearing a black tuxedo with a white undershirt and a white hankerchief in his front pocket. He looks awfully thin, almost frail. His hair is a light grey, and only along the outside of his head as the top of his head is bald. His eyebrows seem unnecessarily long, and his eyes are almost completely circular in shape. His ears are pointed and his nose... extends at least 4 inches from his face. All of this conveys the look of an older man, but as he speaks to you, he does so in a voice that is both inquisitive and strangely upbeat, almost as if he anticipated your arrival:';
   appendOutputConsole('p', outputText);
 
   appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision11A()">Continue</button>', 'flex-container justify-center');
@@ -114,7 +116,7 @@ insertedElement.setAttribute('class', 'game text-center');
 insertedElement.setAttribute('id', 'health-notice');
 insertedElement.innerHTML = '-1 HEALTH';
 gameConsole.appendChild(insertedElement);
-textTimer = setTimeout(function(){ document.getElementById('health-notice').innerHTML="" }, 3000);
+textTimer = setTimeout(function(){ document.getElementById('health-notice').innerHTML=""; }, 3000);
 
 
 } // end decision12()
@@ -129,7 +131,7 @@ lifeBar.setAttribute('class', 'dead-text');
 
 gameConsole.innerHTML = '';
 
-outputText = 'First floating doors, now giant blobs? \"No thanks.\", you think as you sprint outside as fast as you can. As you do so, the rumbling intensifies, only increasing your desire to get out. When you arrive outside, the rumbling stops. As you catch your breath, you are at first thankful for the silence and then look around you and notice a different kind of silence. Everything outside seems normal, but there\'s no ambient sounds whatsoever. Cars, animals, the wind, nothing is making any sound. Where you expect to see people walking down the street or cars passing, there is nothing. It as if all life here has disappeared. \nThe eerieness of such a view has taken so much of your attention that you don\'t notice the blob behind you, and this time it brought friends. They all pass through you from behind this time, and the fatigue from before is now overwhelming. As you begin to lose consciousness, you hear a faint voice. You can only make out two words: \"How disappointing\".'
+outputText = 'First floating doors, now giant blobs? \"No thanks.\", you think as you sprint outside as fast as you can. As you do so, the rumbling intensifies, only increasing your desire to get out. When you arrive outside, the rumbling stops. As you catch your breath, you are at first thankful for the silence and then look around you and notice a different kind of silence. Everything outside seems normal, but there\'s no ambient sounds whatsoever. Cars, animals, the wind, nothing is making any sound. Where you expect to see people walking down the street or cars passing, there is nothing. It as if all life here has disappeared. \nThe eerieness of such a view has taken so much of your attention that you don\'t notice the blob behind you, and this time it brought friends. They all pass through you from behind this time, and the fatigue from before is now overwhelming. As you begin to lose consciousness, you hear a faint voice. You can only make out two words: \"How disappointing\".';
 
 appendOutputConsole('p', outputText, '', '');
 appendOutputConsole('p', '\nYou never saw it coming, and it was most definitely your last surprise', '', '');
