@@ -12,7 +12,7 @@ let outputText = '';
 let textTimer = '';
 
 document.getElementById('intro-button').addEventListener('click', beginGame);
-document.getElementById('intro-button').addEventListener('touch', beginGame);
+document.getElementById('intro-button').addEventListener('touchstart', beginGame);
 
 drawHealthBar();
 
