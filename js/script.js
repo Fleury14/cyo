@@ -4,12 +4,14 @@
 let playerHealth = 3; // Players Health
 let gameConsole = document.getElementById('gameConsole');
 let lifeBar = document.getElementById('life-bar');
+let dialogueBox = document.getElementById('dialogue-box');
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
+let playerName = '';
 
 let insertedElement = '';
 let elementTarget = '';
 let outputText = '';
-let textTimer = '';
+
 
 document.getElementById('intro-button').addEventListener('click', beginGame);
 document.getElementById('intro-button').addEventListener('touchstart', beginGame);
@@ -78,9 +80,14 @@ gameConsole.innerHTML = '';
 }
 
 function decision11A() {
-
+// Continuation of door event
   gameConsole.innerHTML = '';
-  appendOutputConsole('p', 'Hello!');
+
+// Igor speaks
+  dialogueText('"Teacher"', 'Hello! Welcome to... this place. I\'m sure you have many question. Unfortunately, I cannot answer many of them at this time. If you would be so kind as to give me your name, I will divulge what I can. ');
+
+// response
+  appendOutputConsole('p' , 'He is correct in that you have many questions, but you wouldn\'t even know what to ask. You decide to give him your name. ');
 
 }
 
@@ -141,6 +148,7 @@ appendOutputConsole('p', 'REFRESH TO TRY AGAIN', 'text-center game');
 
 }
 
+// fucntion for outputting to conosle
 function appendOutputConsole(element, value, className, idName, onClick) {
   insertedElement = document.createElement(element);
   insertedElement.setAttribute('class', className);
@@ -148,4 +156,26 @@ function appendOutputConsole(element, value, className, idName, onClick) {
   insertedElement.setAttribute('onclick', onClick);
   insertedElement.innerHTML = value;
   gameConsole.appendChild(insertedElement);
+}
+
+// function for spoken dialogue box
+function dialogueText(speaker, text) {
+
+  gameConsole.classList.add('blacken');
+  dialogueBox.classList.add('show-dialogue');
+
+  dialogueBox.innerHTML = '<p class="game">' + speaker + '</p><p class="dos">' + text + '</p><button class="btn btn-primary dialogue-button" onclick="pauseClick()">Continue</button>';
+
+  textTimer = setTimeout( function() {
+    dialogueBox.classList.remove('show-dialogue');
+    gameConsole.classList.remove('blacken');
+   }, 3000);
+
+}
+
+// function to remove dialogue 
+function pauseClick() {
+  clearTimeout(textTimer);
+  dialogueBox.classList.remove('show-dialogue');
+  gameConsole.classList.remove('blacken');
 }

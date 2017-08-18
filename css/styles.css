@@ -86,6 +86,11 @@ body {
   font-family: 'DOS';
   font-size: 1.5em;
   color: #fff;
+  transition: all 0.3s;
+}
+
+.blacken {
+  color: #000;
 }
 
 #console-button-row {
@@ -107,4 +112,38 @@ body {
 
 .first-button:active {
   background-color: #666;
+}
+
+/* End bottom styles */
+
+/* Begin dialogue box */
+
+#dialogue-box {
+  width: 90%;
+  position: absolute;
+  border: 3px solid #f00;
+  border-radius: 5%;
+  top: 25%;
+  color: #fff;
+  transition: .3s all;
+  padding: 10px;
+  box-shadow: 3px 3px 3px #f33;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.hide-dialogue {
+
+  transform: translate(-105%, -50%);
+}
+
+.show-dialogue {
+  transform: translate(5%, -50%);
+}
+
+.dialogue-button {
+  font-family: 'DOS';
+  align-self: center;
+
 }
