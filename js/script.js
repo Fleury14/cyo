@@ -7,11 +7,18 @@ let lifeBar = document.getElementById('life-bar');
 let dialogueBox = document.getElementById('dialogue-box');
 let blackBox = document.getElementById('blackBox');
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
-let playerName = '';
+let playerName = ''; // players name
 
+// used for outputting to DOM
 let insertedElement = '';
 let elementTarget = '';
 let outputText = '';
+
+let dialogueTime = ''; //used as set interval later
+let dialogueFlag = -1; //used to keep track of conversation steps
+let needClear = true; //used to avoid two straight dialogue draws
+let dialogueCont = false; // used for the continue button in long conversation
+let dialogueShown = false; // used to determine if a dialogue has been drawn in conversations
 
 
 document.getElementById('intro-button').addEventListener('click', beginGame);
@@ -93,8 +100,76 @@ function decision11A() {
 }
 
 function decision11B() {
-  playerName = prompt('Please input your name:');
+  playerName = prompt('Please input your name:'); // Get players name
+  dialogueFlag = 0; // initiate conversation chain
+  gameConsole.innerHTML = ''; //clear screen
+
+
+  console.log('interval set');
+  dialogueTime = setInterval( dial11B, 1000);
+
+  function dial11B() {
+
+    console.log('dial11b invoked');
+    switch(dialogueFlag) {
+
+      case 0:
+        console.log(dialogueCont);
+        if(dialogueShown == false) {
+          dialogueText('"Teacher"' , 'Excellent. Now listen carefully. This room that you are in exists outside of normal space. It is a physical manifestation of your own consciousness. For some people it can be an elevator, for others a jail cell. In your case, since you are, and will be, constantly learning, this is a classroom. I am here to help you out of your current plight, but I only offer the tools to do so. The correct decisions will still need to be made by you.');
+          dialogueShown = true; }
+
+        if(dialogueCont == true) {
+          console.log('true flag tripped');
+          dialogueFlag++;
+          dialogueShown = false;
+          dialogueCont = false;
+          needClear = false;
+        } //end if
+        break; //break case 0
+
+      case 1:
+        if(dialogueShown == false) {
+
+          appendOutputConsole('p' , 'While you find it somewhat difficult to wrap your head around what he just said, you pay special attention to the last part. \"What plight?\" you think, and almost as if he can read your thoughts, he continues on:');
+          appendOutputConsole('div', '<button class="btn btn-primary" onclick="pauseClick()">Continue</button>', 'flex-container justify-center');
+          dialogueShown = true;  }
+
+        if(dialogueCont == true) {
+          dialogueFlag++;
+          dialogueShown = false;
+          dialogueCont = false;
+          needClear = false;
+        }  // end if;
+        break; //break case 1
+
+      case 2:
+          if(dialogueShown == false) {
+            dialogueText('"Teacher"', 'Prior to entering this room, you had an event occur which triggered a temporary bluriness of vision and a small degree of nausea did you not? This is because you were transported to another realm. While this place that you are in right now has no connection with the outside world, the one you crossed into is inexorably linked to the \"real\" world.\nBut it is dangerous. It is inhabited not by people, but by beings known as shadows.');
+            dialogueShown=true;
+          }
+
+          if(dialogueCont == true) {
+            dialogueFlag++;
+            dialogueShown=false;
+            dialogueCont=false;
+            needClear=true;
+          }
+      break;
+
+      case 3:
+          clearInterval(dialogueTime);
+          console.log('dialogue ovah!');
+          break;
+
+    } //end switch
+
+  }//end dial11B fucntion
+
 }
+
+
+
 
 function decision12() {
 // Player chose to not go through the door. peanlty is one life. failure to answer correctly will result in instant death
@@ -171,16 +246,32 @@ function dialogueText(speaker, text) {
 
   dialogueBox.innerHTML = '<p class="game">' + speaker + '</p><p class="dos">' + text + '</p><button class="btn btn-primary dialogue-button" onclick="pauseClick()">Continue</button>';
 
-  textTimer = setTimeout( function() {
-    dialogueBox.classList.remove('show-dialogue');
-    blackBox.classList.remove('blacken');
-   }, 3000);
-
-}
+  if(dialogueFlag < 0) { //do not auto blaken in a dialogue chain
+    textTimer = setTimeout( function() {
+      dialogueBox.classList.remove('show-dialogue');
+      blackBox.classList.remove('blacken');
+    }, 5000);
+  }// end if
+} //end dialogueText
 
 // function to remove dialogue
 function pauseClick() {
-  clearTimeout(textTimer);
-  dialogueBox.classList.remove('show-dialogue');
-  blackBox.classList.remove('blacken');
+
+  console.log('pauseClick invoked');
+  if(dialogueFlag < 0) {
+    clearTimeout(textTimer);
+    dialogueBox.classList.remove('show-dialogue');
+    blackBox.classList.remove('blacken');
+ }
+
+  if (dialogueFlag >= 0) {
+    dialogueCont = true;
+
+    if (needClear == true) { // only remove the black box and dialogue box if another dialogue box is not next
+      dialogueBox.classList.remove('show-dialogue');
+      blackBox.classList.remove('blacken');
+    }
+
+  } // if theres a conversation chain, clicking this button will progress it
+
 }
