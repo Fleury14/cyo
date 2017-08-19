@@ -5,6 +5,7 @@ let playerHealth = 3; // Players Health
 let gameConsole = document.getElementById('gameConsole');
 let lifeBar = document.getElementById('life-bar');
 let dialogueBox = document.getElementById('dialogue-box');
+let blackBox = document.getElementById('blackBox');
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
 let playerName = '';
 
@@ -88,7 +89,11 @@ function decision11A() {
 
 // response
   appendOutputConsole('p' , 'He is correct in that you have many questions, but you wouldn\'t even know what to ask. You decide to give him your name. ');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision11B()">Continue</button>', 'flex-container justify-center');
+}
 
+function decision11B() {
+  playerName = prompt('Please input your name:');
 }
 
 function decision12() {
@@ -161,21 +166,21 @@ function appendOutputConsole(element, value, className, idName, onClick) {
 // function for spoken dialogue box
 function dialogueText(speaker, text) {
 
-  gameConsole.classList.add('blacken');
+  blackBox.classList.add('blacken');
   dialogueBox.classList.add('show-dialogue');
 
   dialogueBox.innerHTML = '<p class="game">' + speaker + '</p><p class="dos">' + text + '</p><button class="btn btn-primary dialogue-button" onclick="pauseClick()">Continue</button>';
 
   textTimer = setTimeout( function() {
     dialogueBox.classList.remove('show-dialogue');
-    gameConsole.classList.remove('blacken');
+    blackBox.classList.remove('blacken');
    }, 3000);
 
 }
 
-// function to remove dialogue 
+// function to remove dialogue
 function pauseClick() {
   clearTimeout(textTimer);
   dialogueBox.classList.remove('show-dialogue');
-  gameConsole.classList.remove('blacken');
+  blackBox.classList.remove('blacken');
 }
