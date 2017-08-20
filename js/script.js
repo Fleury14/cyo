@@ -109,7 +109,7 @@ function decision11B() {
 
 
   console.log('interval set');
-  dialogueTime = setInterval( dial11B, 1000);
+  dialogueTime = setInterval( dial11B, 250);
 
   function dial11B() {
 
@@ -214,6 +214,12 @@ function decision11B() {
 
 function decision11C() {
   inventoryButton.classList.remove('invisible');
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', 'You exit the classroom and return to where you were. The same uneasiness from before is still there. That teacher didn\'t tell you where to go, but you decided going outside to investigate your surrounding would be a good start. Upon arriving outside you notice the absence of any people whatsoever. Fortunately, the teacher somewhat prepared you for that, so you notice a small rumbling behind you. When you turn around you see a flotaing grey blob with a mask on it. As it approaches you, it starts to take shape, transforming in to a small demon-ish imp about 2 feet in height holding a spoon that it lit on fire. It would almost seem cute if it wasn\'t trying to kill you. ')
+  appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision21()">Use fire bottle</button><button class="btn btn-primary" onclick="decision22()">Use freeze spray</button><button class="btn btn-success" onclick="decision23()">Use Air Cannon</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-info" onclick="decision23()">Use Stun Gun</button><button class="btn btn-warning" onclick=decision24()>Run Away</button>', 'flex-container justify-space-around');
+  appendOutputConsole('p', 'Push the inventory button at any time to show your inventory', 'game');
+
 }
 
 
