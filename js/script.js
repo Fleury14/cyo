@@ -2,10 +2,13 @@
 
 // Variable Initialization
 let playerHealth = 3; // Players Health
-let gameConsole = document.getElementById('gameConsole');
-let lifeBar = document.getElementById('life-bar');
-let dialogueBox = document.getElementById('dialogue-box');
-let blackBox = document.getElementById('blackBox');
+let elemInv = [ ['Fire Bottle', 0], ['Freeze Spray', 0], ['Air Cannon', 0], ['Stun Gun', 0] ];
+const gameConsole = document.getElementById('gameConsole');
+const lifeBar = document.getElementById('life-bar');
+const dialogueBox = document.getElementById('dialogue-box');
+const blackBox = document.getElementById('blackBox');
+const inventoryButton = document.getElementById('inventoryButton');
+const inventoryBox = document.getElementById('inventoryBox');
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
 let playerName = ''; // players name
 
@@ -110,7 +113,7 @@ function decision11B() {
 
   function dial11B() {
 
-    console.log('dial11b invoked');
+
     switch(dialogueFlag) {
 
       case 0:
@@ -145,6 +148,7 @@ function decision11B() {
 
       case 2:
           if(dialogueShown == false) {
+            gameConsole.innerHTML = '';
             dialogueText('"Teacher"', 'Prior to entering this room, you had an event occur which triggered a temporary bluriness of vision and a small degree of nausea did you not? This is because you were transported to another realm. While this place that you are in right now has no connection with the outside world, the one you crossed into is inexorably linked to the \"real\" world.\nBut it is dangerous. It is inhabited not by people, but by beings known as shadows.');
             dialogueShown=true;
           }
@@ -153,21 +157,64 @@ function decision11B() {
             dialogueFlag++;
             dialogueShown=false;
             dialogueCont=false;
-            needClear=true;
+            needClear=false;
           }
-      break;
+          break; //break case 2
 
       case 3:
-          clearInterval(dialogueTime);
-          console.log('dialogue ovah!');
-          break;
+          if(dialogueShown == false) {
 
+            if(playerHealth === 2) {
+              dialogueText('"Teacher"', 'You have already encountered these beings, so you should know the danger they pose.');
+              dialogueShown = true;
+            }//end playerHealthif
+
+            if(playerHealth === 3) {
+              dialogueText('"Teacher"', 'You have yet to encounter them, but you soon will, and they are quite dangerous.');
+              dialogueShown = true;
+            }//end playerHealth if
+
+          } //end diallogueshown iff
+
+          if(dialogueCont == true) {
+            dialogueFlag++;
+            dialogueShown=false;
+            dialogueCont=false;
+            needClear=true;
+          }
+
+          break; //break case 3
+
+      case 4:
+        if(dialogueShown == false) {
+          dialogueText('"Teacher"', 'Now pay close attention as your survival depends on it. While you do not possess the ability to fight shadows yourself, I will provide you with some items that you will find useful. Pay special attention to your enemies, as some items will be more useful against particular shadows. Now go and see if you can find your way to safety');
+          dialogueShown=true;
+        }
+        if(dialogueCont == true) {
+          dialogueFlag++;
+          dialogueShown=false;
+          dialogueCont=false;
+          needClear=false;
+        }
+        break; //end case 4
+
+      case 5:
+      if(dialogueShown == false) {
+        gameConsole.innerHTML='';
+        appendOutputConsole('p' , 'The teacher motions you to his desk. As you approach, he hands you four sets of items. Upon closer inspection, you notice that the items correspond to four elements: fire, ice, wind, and lightning. Before you can ask the teacher any more questions about what is going on, you are whisked out of the blue classroom. Now you are back where you started, and you hear the same rumbling before. But this time, you are ready for it. At least thats what you tell yourself');
+        appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision11C()">Continue</button>', 'flex-container justify-center');
+        appendOutputConsole('p', 'Received Flame bottle x 3, Ice spray x 3, Air Cannon x 3, Stun Gun x 3', 'game');
+        clearInterval(dialogueTime);
+        console.log('dialogue ovah!');
+      }
+      break; //end case 5 and end of dialogue
     } //end switch
-
   }//end dial11B fucntion
+} // end 11b function
 
+function decision11C() {
+  inventoryButton.classList.remove('invisible');
 }
-
 
 
 
@@ -247,7 +294,9 @@ function dialogueText(speaker, text) {
   dialogueBox.innerHTML = '<p class="game">' + speaker + '</p><p class="dos">' + text + '</p><button class="btn btn-primary dialogue-button" onclick="pauseClick()">Continue</button>';
 
   if(dialogueFlag < 0) { //do not auto blaken in a dialogue chain
+
     textTimer = setTimeout( function() {
+      console.log('function triggered');
       dialogueBox.classList.remove('show-dialogue');
       blackBox.classList.remove('blacken');
     }, 5000);
@@ -271,7 +320,25 @@ function pauseClick() {
       dialogueBox.classList.remove('show-dialogue');
       blackBox.classList.remove('blacken');
     }
-
   } // if theres a conversation chain, clicking this button will progress it
+} //end pauseclick()
 
+function showInventory() {
+
+  inventoryBox.classList.remove('hide-inventory');
+  elemInv.forEach( function(item, index) {
+    insertedElement=document.createElement('p');
+    insertedElement.textContent = item[0] + ': ' + item[1];
+    inventoryBox.appendChild(insertedElement);
+  }); // end foreach
+
+  insertedElement = document.createElement('div');
+  insertedElement.innerHTML = '<button class="btn btn-warning flex-container justify-center dos" onclick="hideInventory()">Hide Inventory</button>';
+  inventoryBox.appendChild(insertedElement); // draw hide inv button
+
+}// end show inventory
+
+function hideInventory() {
+  inventoryBox.classList.add('hide-inventory'); //shift box over
+  let inventoryDelay = setTimeout(function() {inventoryBox.innerHTML = '';}, 250); // empty content
 }
