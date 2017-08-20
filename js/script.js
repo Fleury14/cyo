@@ -9,6 +9,7 @@ const dialogueBox = document.getElementById('dialogue-box');
 const blackBox = document.getElementById('blackBox');
 const inventoryButton = document.getElementById('inventoryButton');
 const inventoryBox = document.getElementById('inventoryBox');
+const jokerBox = document.getElementById('jokerBox');
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
 let playerName = ''; // players name
 
@@ -111,7 +112,7 @@ function decision11B() {
   console.log('interval set');
   dialogueTime = setInterval( dial11B, 250);
 
-  function dial11B() {
+  function dial11B() { //dialogue chain start
 
 
     switch(dialogueFlag) {
@@ -204,7 +205,7 @@ function decision11B() {
         appendOutputConsole('p' , 'The teacher motions you to his desk. As you approach, he hands you four sets of items. Upon closer inspection, you notice that the items correspond to four elements: fire, ice, wind, and lightning. Before you can ask the teacher any more questions about what is going on, you are whisked out of the blue classroom. Now you are back where you started, and you hear the same rumbling before. But this time, you are ready for it. At least thats what you tell yourself');
         appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision11C()">Continue</button>', 'flex-container justify-center');
         appendOutputConsole('p', 'Received Flame bottle x 3, Ice spray x 3, Air Cannon x 3, Stun Gun x 3', 'game');
-        clearInterval(dialogueTime);
+        clearInterval(dialogueTime); // Stop the dialogue refresh, give the player first items
         console.log('dialogue ovah!');
       }
       break; //end case 5 and end of dialogue
@@ -213,13 +214,13 @@ function decision11B() {
 } // end 11b function
 
 function decision11C() {
-  inventoryButton.classList.remove('invisible');
-  gameConsole.innerHTML='';
+  inventoryButton.classList.remove('invisible'); // show inventory button
+  gameConsole.innerHTML=''; // clear console
   appendOutputConsole('p', 'You exit the classroom and return to where you were. The same uneasiness from before is still there. That teacher didn\'t tell you where to go, but you decided going outside to investigate your surrounding would be a good start. Upon arriving outside you notice the absence of any people whatsoever. Fortunately, the teacher somewhat prepared you for that, so you notice a small rumbling behind you. When you turn around you see a flotaing grey blob with a mask on it. As it approaches you, it starts to take shape, transforming in to a small demon-ish imp about 2 feet in height holding a spoon that it lit on fire. It would almost seem cute if it wasn\'t trying to kill you. ')
   appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision21()">Use fire bottle</button><button class="btn btn-primary" onclick="decision22()">Use freeze spray</button><button class="btn btn-success" onclick="decision23()">Use Air Cannon</button>', 'flex-container justify-space-around');
   appendOutputConsole('div', '<button class="btn btn-info" onclick="decision23()">Use Stun Gun</button><button class="btn btn-warning" onclick=decision24()>Run Away</button>', 'flex-container justify-space-around');
   appendOutputConsole('p', 'Push the inventory button at any time to show your inventory', 'game');
-
+  // ^^ set up first encounter
 }
 
 
@@ -279,6 +280,10 @@ appendOutputConsole('p', '\nYou never saw it coming, and it was most definitely 
 appendOutputConsole('p', '*GAME OVER*', 'text-center game');
 appendOutputConsole('p', 'REFRESH TO TRY AGAIN', 'text-center game');
 
+}
+
+function decision22() {
+  critAnimation();
 }
 
 // fucntion for outputting to conosle
@@ -347,4 +352,15 @@ function showInventory() {
 function hideInventory() {
   inventoryBox.classList.add('hide-inventory'); //shift box over
   let inventoryDelay = setTimeout(function() {inventoryBox.innerHTML = '';}, 250); // empty content
+}
+
+function critAnimation() {
+  let critSound = new Audio('sound/persona5-crit.wav');
+  critSound.play();
+  jokerBox.classList.remove('hide-joker');
+  setTimeout(function() {jokerBox.classList.add('done-joker')}, 1000);
+  setTimeout(function() {jokerBox.classList.add('no-transition')}, 1020);
+  setTimeout(function() {jokerBox.classList.add('hide-joker')}, 1040);
+  setTimeout(function() {jokerBox.classList.remove('done-joker')}, 1060);
+  setTimeout(function() {jokerBox.classList.remove('no-transition')}, 1080);
 }
