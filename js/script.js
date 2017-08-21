@@ -2,7 +2,9 @@
 
 // Variable Initialization
 let playerHealth = 3; // Players Health
+let extraLife = 0; // second change if they get to 0 life
 let elemInv = [ ['Fire Bottle', 0], ['Freeze Spray', 0], ['Air Cannon', 0], ['Stun Gun', 0] ];
+
 const gameConsole = document.getElementById('gameConsole');
 const lifeBar = document.getElementById('life-bar');
 const dialogueBox = document.getElementById('dialogue-box');
@@ -36,11 +38,21 @@ function drawHealthBar() { // Function to refresh the health bar
 
   if (playerHealth === 0) { // if health = 0, uh oh
 
-  lifeBar.innerHTML = 'DANGER';
-  lifeBar.setAttribute('class', 'text-warning');
+    if (extraLife === 0) { // and no extra life? you dead.
+      lifeBar.innerHTML = '*DEAD*'
+      lifeBar.setAttribute('class', 'text-danger');
 
+      gameConsole.innerHTML = '';
+      appendOutputConsole ('p', 'You have ran out of health. You collapse on the ground, disappointed that the decisions you made have left to this. You though you made the right choice. Instead, it turned out to be your last surprise.');
+      appendOutputConsole ('p', 'GAME OVER. REFRESH TO TRY AGAIN', 'text-center game');
+      // Gaaaaaaame Ooooovaaaahhh!!!!
+    } else { // end extra life check
+      lifeBar.innerHTML = 'DANGER';
+      lifeBar.setAttribute('class', 'text-warning');
+    } // end extra life else
   } else { // otherwise draw health as usual
 
+    if(playerName != '') {lifeBar.innerHTML = playerName + ': ';}
     for (i = 0; i < playerHealth; i++) { // Loop for each health point
 
       lifeBar.innerHTML += '<i class="fa fa-heart" aria-hidden="true"></i>';
@@ -105,6 +117,7 @@ function decision11A() {
 
 function decision11B() {
   playerName = prompt('Please input your name:'); // Get players name
+  drawHealthBar(); //redraw healthbar with name
   dialogueFlag = 0; // initiate conversation chain
   gameConsole.innerHTML = ''; //clear screen
 
@@ -221,6 +234,10 @@ function decision11C() {
   appendOutputConsole('div', '<button class="btn btn-info" onclick="decision23()">Use Stun Gun</button><button class="btn btn-warning" onclick=decision24()>Run Away</button>', 'flex-container justify-space-around');
   appendOutputConsole('p', 'Push the inventory button at any time to show your inventory', 'game');
   // ^^ set up first encounter
+
+  elemInv.forEach(function(item, index){
+    item[1] = 3;
+  }); // give player 3 of each element
 }
 
 
@@ -282,9 +299,85 @@ appendOutputConsole('p', 'REFRESH TO TRY AGAIN', 'text-center game');
 
 }
 
-function decision22() {
-  critAnimation();
+function decision21() {
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 0) == false) {return;};
+  elemInv[0][1]--;
+  //user decided to use the one item that heals the enemy. -1 health
+  gameConsole.innerHTML = '';
+  playerHealth--; // lower health
+  drawHealthBar(); //redraw health
+  if(playerHealth==0) {return;} //death check (since death by low health is now possible)
+  appendOutputConsole('p', 'The imp holds his spoon up to the fire bottle as you throw it at him and it only intensifies the flame on the end. Then, he somehow throws that flame at you, doing damage in the process. you remind yourself that it\'s probably not a good idea to use the element that a shadow has an affinity for.');
+  appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision21()">Use fire bottle</button><button class="btn btn-primary" onclick="decision22()">Use freeze spray</button><button class="btn btn-success" onclick="decision23A()">Use Air Cannon</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-info" onclick="decision23B()">Use Stun Gun</button><button class="btn btn-warning" onclick="decision24()">Run Away</button>', 'flex-container justify-space-around');
+  appendOutputConsole('p', '-1 HEALTH', 'game');
+
+
 }
+
+function decision22() {
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 1) == false) {return;};
+  elemInv[1][1]--;
+
+  critAnimation();
+  gameConsole.innerHTML = '';
+  appendOutputConsole('p', 'The imp clearly does not like the cold in any manner, as not only does it clearly damage him, but it is knocked over in agony. You get the idea that using one more item could finish it off. On the other hand, this would be a great chance to escape.');
+  appendOutputConsole('div', '<button class="btn btn-info" onclick="decision22A()">Use another</button><button class="btn btn-warning" onclick="decision25()">Run away</button>', 'flex-container justify-space-around');
+}
+
+function decision22A() {
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 1) == false) {return;};
+  elemInv[1][1]--;
+
+  // player vanquishes monster
+  gameConsole.innerHTML = '';
+  appendOutputConsole('p', 'A second freeze spray was too much for it to handle, and the shadow evaporates into thin air...')
+
+  // give life bonus if health is 4 or less
+  healthBonus();
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision25()">Continue</button>', 'flex-container justify-center');
+} // end 22a
+
+function decision23A() { //player selected wind
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 2) == false) {return;};
+  elemInv[2][1]--;
+
+  decision23();
+} // end 23a
+
+function decision23B() { //player used lightning
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 3) == false) {return;};
+  elemInv[3][1]--;
+
+  decision23();
+} //end 23b
+
+function decision23() {
+  gameConsole.innerHTML = '';
+  appendOutputConsole('p', 'You use the item on the shadow and it recoils in shock. In fact it seemed so sure that you were defenseless that it gives you plenty of time to escape.');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision25()">Continue</button>');
+}// end 23
+
+function decision24() {
+  gameConsole.innerHTML = '';
+  playerHealth--;
+  drawHealthBar();
+  appendOutputConsole('p', 'You decide not to chance using the items and instead try an escape. The imp is prepared, however, and cuts you off while burning you with the flame on his spoon');
+  appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision21()">Use fire bottle</button><button class="btn btn-primary" onclick="decision22()">Use freeze spray</button><button class="btn btn-success" onclick="decision23A()">Use Air Cannon</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-info" onclick="decision23B()">Use Stun Gun</button><button class="btn btn-warning" onclick="decision24()">Run Away</button>', 'flex-container justify-space-around');
+  appendOutputConsole('p', '-1 HEALTH', 'game flex-container justify-center');
+} // end 24
+
+function decision25() {
+  gameConsole.innerHTML = '1st encounter successful!';
+
+}
+
 
 // fucntion for outputting to conosle
 function appendOutputConsole(element, value, className, idName, onClick) {
@@ -336,6 +429,8 @@ function pauseClick() {
 
 function showInventory() {
 
+  if (!(inventoryBox.classList.contains('hide-inventory'))) { return;}
+
   inventoryBox.classList.remove('hide-inventory');
   elemInv.forEach( function(item, index) {
     insertedElement=document.createElement('p');
@@ -363,4 +458,21 @@ function critAnimation() {
   setTimeout(function() {jokerBox.classList.add('hide-joker')}, 1040);
   setTimeout(function() {jokerBox.classList.remove('done-joker')}, 1060);
   setTimeout(function() {jokerBox.classList.remove('no-transition')}, 1080);
+}
+
+function inventoryCheck(invArr, item) {
+  if(invArr[item][1] === 0) {
+    appendOutputConsole('p', 'You dont have any more of that item!', 'text-center dos');
+    return false;}
+  else {return true;}
+}
+
+function healthBonus() {
+  if (playerHealth < 4) {
+    appendOutputConsole('p', 'After the monster disappears, a clear plastic bottle drops to the ground. How and why a monster like that was carrying a plastic bottle is mind-boggling, but as you go to pick it up, it emits an absolutely delicious scent. You can\'t help but to drink it immediately, and after doing so, you feel even stronger than before');
+    playerHealth++;
+    console.log('ph:', playerHealth);
+    drawHealthBar();
+    appendOutputConsole('p', '+1 HEALTH', 'game flex-container justify-center');
+  }
 }
