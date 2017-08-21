@@ -4,6 +4,9 @@
 let playerHealth = 3; // Players Health
 let extraLife = 0; // second change if they get to 0 life
 let elemInv = [ ['Fire Bottle', 0], ['Freeze Spray', 0], ['Air Cannon', 0], ['Stun Gun', 0] ];
+let bossAffinity = ['red', 'blue', 'green', 'yellow'];
+let bossHealth = 3; // initialize boss health for next encounter
+let currAffinity = 0;
 
 const gameConsole = document.getElementById('gameConsole');
 const lifeBar = document.getElementById('life-bar');
@@ -388,7 +391,7 @@ function decision31() { // player uses fire. lands a crit, killing the monster, 
   critAnimation();
   gameConsole.innerHTML='';
   appendOutputConsole('p', 'As the bicorn kicks up another fierce wind gust, you throw the fire bottle at it. It shatters before reaching it\'s target, but the wind only fuels the fire as the bicorn is scorched, as you barely dive out of the way from the expanding blast. As you watch the bicorn dissolve, you think you see it containing some sort of item, but it also is burned in the blast. ');
-  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision35()">Continue</button>');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision35()">Continue</button>', 'flex-container justify-center');
 } // end f31
 
 function decision32() { // player uses ice, no effect, but no damage, retry
@@ -431,14 +434,89 @@ function decision34() { // player uses lightning. lands crit, health bonus
 
 function decision35() { // enncounter success, prelude to boss fight
   gameConsole.innerHTML='';
+  let bossHealth = 3; // initialize boss health for next encounter
   appendOutputConsole('p', 'After defeating the bicorn you make your way to the building where you thought you heard the voices. Now there seems to be only one voice, a female with a strong, assertive tone. You enter the building, and as you enter, you try to figure out where this woman is. In the buildings foyer, you hear another large rumbling. Something is coming, and it is much bigger than the previous two encounters');
-  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision36()">Continue</button>', 'flex container, justify-center');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision36()">Continue</button>', 'flex-container justify-center');
+
 } // end f35
 
 function decision36() { // begin boss fight
+/* Boss fight mechanics: Boss will start with 3 health. Each round, its shield wil glow a color corresponding to an element. If the player picked the opposite color, he will do damage. If picks the same color, he will take damage. Anything else will have no effect */
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', '*Boss Fight*', 'text-center game');
+  appendOutputConsole('h1', 'BERITH', 'text-center game');
+  appendOutputConsole('p', 'Health: ' + bossHealth, 'text-center');
+  appendOutputConsole('p', 'This time, the shadow turns into a knight atop a floating horse, armed with a spear and shield. Of particular note is its shield: It is glowing a distinct color and you feel like this is going to be the key to the battle. You look over your inventory one last time and harden your resolve. One of you is walking away from this. ');
 
+  currAffinity = Math.floor(Math.random() * 4);
+  appendOutputConsole('p', 'The knight\'s shield is glowing ' + bossAffinity[currAffinity]);
+  appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+} // end f36
+
+function decision41(item) { // Player used item, check affinity for result and redraw
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, item) == false) {return;}
+  elemInv[item][1]--;
+
+// check if same affinity way used
+  if(item == currAffinity){
+    playerHealth--;
+    drawHealthBar();
+    decision41A();
+    appendOutputConsole('p', 'The knight\'s shield is glowing ' + bossAffinity[currAffinity]);
+    appendOutputConsole('p', 'Boss is strong against this element!');
+    appendOutputConsole('p', '-1 HEALTH', 'text-center game');
+    appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+
+  } else if ( (item == 0 && currAffinity == 1) || (item == 1 && currAffinity == 0) || (item == 2 && currAffinity == 3) || (item == 3 && currAffinity == 2) ) { // since opposite pairings are 0-2 and 1-3, we can just use remainder2 operator to check
+    bossHealth--;
+    if (bossHealth < 1) {  decision42(); return; } // check to see if boss is dead-text
+    currAffinity = Math.floor(Math.random() * 4);
+    decision41A();
+    appendOutputConsole('p', 'You exploited a weakness and did some damage! But something is now different...');
+    appendOutputConsole('p', 'The knight\'s shield is now glowing ' + bossAffinity[currAffinity]);
+    appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+  } else {
+    decision41A();
+    appendOutputConsole('p', 'The item had no effect. Try something else.');
+    appendOutputConsole('p', 'The knight\'s shield is glowing ' + bossAffinity[currAffinity]);
+    appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+  } // end iff
+} //end f41
+
+function decision41A() { //boss redraw
+// check if player is out of items
+if(elemInv[0] + elemInv[1] + elemInv[2] + elemInv[3] == 0) { decision44(); }
+
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', '*Boss Fight*', 'text-center game');
+  appendOutputConsole('h1', 'BERITH', 'text-center game');
+  appendOutputConsole('p', 'Health: ' + bossHealth, 'text-center');
+} // f41a
+
+function decision42() { // Boss defeated
+
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', 'The boss begins to keel over. You prepare to empty the rest of your inventory on the thing when you are startled by the womans voice. You hear her yell "Go, Artemisia", and before you realize what\'s happening, the boss is enveloped in a giant ice cube, and then shatters to pieces.');
+  appendOutputConsole('p', 'BOSS DEFEATED!!', 'text-center game');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision43()">Continue</button>', 'flex-container justify-center');
 }
 
+function decision43() { // encounter mitsuru, end game
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', 'You look over to the woman and you are hit with a wave of exhaustion. All these encounters have clearly tired you out, and you cant go much farther. You drop to a knee, and as you do, the woman puts her hands on your shoulders. You look up at her; she has long, brunette hair and appears to be wearing what would appear to be a black battle suit except that on top of it she is wearing an extravagant whit fur coat. There is a fencing sword holstered inside her coat. One look at her face and you can tell she is some kind of leader, as she is exuding confidence and strength. She looks down to you and simply says, "My name is Mitsuru Kirijo, and I\'m going to get you out of here"');
+  appendOutputConsole('p', 'TO BE CONTINUED...', 'text-center game');
+}
+
+function decision44() { //player ran out of items -- game over
+gameConsole.innerHTML = '';
+appendOutputConsole('p', 'You no longer have any items with which to fight the boss. As he approached you to attack, you are completely defenseless...');
+appendOutputConsole('p', '** GAME OVER ** ', 'game text-center');
+}
 
 // fucntion for outputting to conosle
 function appendOutputConsole(element, value, className, idName, onClick) {
