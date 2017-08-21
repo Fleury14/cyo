@@ -15,12 +15,32 @@ body {
   background-color: #000;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .flex-container {
   display: flex;
 }
 
 .justify-space-around {
   justify-content: space-around;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.game {
+  font-family: 'Game';
+}
+
+.dos {
+  font-family: 'DOS';
+}
+
+.auto-center {
+  margin: 0 auto;
 }
 
 /* End Global, Begin header styles */
@@ -36,6 +56,20 @@ body {
 
 #life-bar {
   color: #ff0000;
+
+}
+
+.dead-text {
+  color: #f00;
+  animation-name: dead-text-anim;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes dead-text-anim {
+  0% {color: #f00;}
+  50% {color: #fff;}
+  100% {color: #f00;}
 
 }
 
@@ -56,6 +90,12 @@ body {
   font-family: 'DOS';
   font-size: 1.5em;
   color: #fff;
+  transition: all 0.3s;
+}
+
+
+#console-button-row {
+  margin-top: 2em;
 }
 
 .first-button {
@@ -71,6 +111,111 @@ body {
   background-color: #444;
 }
 
-.first-butonn:active {
+.first-button:active {
   background-color: #666;
+}
+
+/* End bottom styles */
+
+/* Begin dialogue box */
+
+#dialogue-box {
+  width: 90%;
+  position: absolute;
+  border: 3px solid #f00;
+  border-radius: 5%;
+  top: 30%;
+  color: #fff;
+  transition: .3s all;
+  padding: 10px;
+  box-shadow: 3px 3px 3px #f33;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  z-index: 15;
+}
+
+.hide-dialogue {
+
+  transform: translate(-105%, -50%);
+}
+
+.show-dialogue {
+  transform: translate(5%, -50%);
+}
+
+.dialogue-button {
+  font-family: 'DOS';
+  align-self: center;
+
+}
+
+/* End dialogue box */
+
+/* begin blacken box. this is used to hide the console when dialogue is posted */
+
+.blacken-box {
+  height: 100vh;
+  width: 100%;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0);
+  top: 75px;
+  z-index: -1;
+  transition: all 1.5s;
+}
+
+.blacken {
+  background-color: rgba(0, 0, 0, 1);
+  z-index: 10;
+}
+
+/* end blacken box */
+
+/* begin inventory */
+
+.inventory-box {
+  width: 80%;
+
+  background-color: #000;
+  border: 2px solid yellow;
+  color: #fff;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 250px;
+  left: 10%;
+  transition: 0.25s all;
+}
+
+.hide-inventory {
+  transform: translateX(115%);
+}
+
+/* End inventory */
+
+/* behin lookin cool joker! */
+
+.joker-box {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  transform: translate(0, -50%);
+  transition: 0.25s all;
+  z-index: 10;
+}
+
+.jokerpic {
+   width: 100%;
+}
+
+.hide-joker {
+  transform: translate(100%, -50%);
+}
+
+.done-joker {
+  transform: translate(-100%, -50%);
+}
+
+.no-transition {
+  transition: 0s all;
 }
