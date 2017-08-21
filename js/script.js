@@ -39,7 +39,7 @@ function drawHealthBar() { // Function to refresh the health bar
   if (playerHealth === 0) { // if health = 0, uh oh
 
     if (extraLife === 0) { // and no extra life? you dead.
-      lifeBar.innerHTML = '*DEAD*'
+      lifeBar.innerHTML = '*DEAD*';
       lifeBar.setAttribute('class', 'text-danger');
 
       gameConsole.innerHTML = '';
@@ -229,7 +229,7 @@ function decision11B() {
 function decision11C() {
   inventoryButton.classList.remove('invisible'); // show inventory button
   gameConsole.innerHTML=''; // clear console
-  appendOutputConsole('p', 'You exit the classroom and return to where you were. The same uneasiness from before is still there. That teacher didn\'t tell you where to go, but you decided going outside to investigate your surrounding would be a good start. Upon arriving outside you notice the absence of any people whatsoever. Fortunately, the teacher somewhat prepared you for that, so you notice a small rumbling behind you. When you turn around you see a flotaing grey blob with a mask on it. As it approaches you, it starts to take shape, transforming in to a small demon-ish imp about 2 feet in height holding a spoon that it lit on fire. It would almost seem cute if it wasn\'t trying to kill you. ')
+  appendOutputConsole('p', 'You exit the classroom and return to where you were. The same uneasiness from before is still there. That teacher didn\'t tell you where to go, but you decided going outside to investigate your surrounding would be a good start. Upon arriving outside you notice the absence of any people whatsoever. Fortunately, the teacher somewhat prepared you for that, so you notice a small rumbling behind you. When you turn around you see a flotaing grey blob with a mask on it. As it approaches you, it starts to take shape, transforming in to a small demon-ish imp about 2 feet in height holding a spoon that it lit on fire. It would almost seem cute if it wasn\'t trying to kill you. ');
   appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision21()">Use fire bottle</button><button class="btn btn-primary" onclick="decision22()">Use freeze spray</button><button class="btn btn-success" onclick="decision23()">Use Air Cannon</button>', 'flex-container justify-space-around');
   appendOutputConsole('div', '<button class="btn btn-info" onclick="decision23()">Use Stun Gun</button><button class="btn btn-warning" onclick=decision24()>Run Away</button>', 'flex-container justify-space-around');
   appendOutputConsole('p', 'Push the inventory button at any time to show your inventory', 'game');
@@ -301,7 +301,7 @@ appendOutputConsole('p', 'REFRESH TO TRY AGAIN', 'text-center game');
 
 function decision21() {
   //make sure player has the item before clearing screen
-  if (inventoryCheck(elemInv, 0) == false) {return;};
+  if (inventoryCheck(elemInv, 0) == false) {return;}
   elemInv[0][1]--;
   //user decided to use the one item that heals the enemy. -1 health
   gameConsole.innerHTML = '';
@@ -316,9 +316,9 @@ function decision21() {
 
 }
 
-function decision22() {
+function decision22() { //player used the correct item. crit bonus, and health bonus if they dont already have 4 health
   //make sure player has the item before clearing screen
-  if (inventoryCheck(elemInv, 1) == false) {return;};
+  if (inventoryCheck(elemInv, 1) == false) {return;}
   elemInv[1][1]--;
 
   critAnimation();
@@ -329,12 +329,12 @@ function decision22() {
 
 function decision22A() {
   //make sure player has the item before clearing screen
-  if (inventoryCheck(elemInv, 1) == false) {return;};
+  if (inventoryCheck(elemInv, 1) == false) {return;}
   elemInv[1][1]--;
 
   // player vanquishes monster
   gameConsole.innerHTML = '';
-  appendOutputConsole('p', 'A second freeze spray was too much for it to handle, and the shadow evaporates into thin air...')
+  appendOutputConsole('p', 'A second freeze spray was too much for it to handle, and the shadow evaporates into thin air...');
 
   // give life bonus if health is 4 or less
   healthBonus();
@@ -343,7 +343,7 @@ function decision22A() {
 
 function decision23A() { //player selected wind
   //make sure player has the item before clearing screen
-  if (inventoryCheck(elemInv, 2) == false) {return;};
+  if (inventoryCheck(elemInv, 2) == false) {return;}
   elemInv[2][1]--;
 
   decision23();
@@ -351,19 +351,19 @@ function decision23A() { //player selected wind
 
 function decision23B() { //player used lightning
   //make sure player has the item before clearing screen
-  if (inventoryCheck(elemInv, 3) == false) {return;};
+  if (inventoryCheck(elemInv, 3) == false) {return;}
   elemInv[3][1]--;
 
   decision23();
 } //end 23b
 
-function decision23() {
+function decision23() { // player used an item that the monster was neither weak nor strong against. encounter success
   gameConsole.innerHTML = '';
   appendOutputConsole('p', 'You use the item on the shadow and it recoils in shock. In fact it seemed so sure that you were defenseless that it gives you plenty of time to escape.');
   appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision25()">Continue</button>');
 }// end 23
 
-function decision24() {
+function decision24() { // player attemps to run away and fails, -1 health
   gameConsole.innerHTML = '';
   playerHealth--;
   drawHealthBar();
@@ -373,8 +373,69 @@ function decision24() {
   appendOutputConsole('p', '-1 HEALTH', 'game flex-container justify-center');
 } // end 24
 
-function decision25() {
-  gameConsole.innerHTML = '1st encounter successful!';
+function decision25() { // Begin encounter 2
+  gameConsole.innerHTML = '';
+  appendOutputConsole('p', 'With that encounter over, you made your way down the street. As you pass by various buildings, you still find it jarring that there is no sense of life whatsoever. After a few minutes, you almost start to become accustomed to it. This just makes it all the more startling when you hear voices from a nearby building. Human voices. As you make your way towards the building, another shadow makes it\'s way towards you, this time forming into what almost looks like a unicorn. At least thats what you would call it except for where you would expect to find a single horn, this creature has two ram-like horns pertruding out, making it for of a bicorn than a unicorn. As it kicks its legs into the air, a fierce wind bats you in the face. It becomes clear that there\'s no getting away from this thing without using an item.');
+  appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision31()">Use fire bottle</button><button class="btn btn-primary" onclick="decision32()">Use freeze spray</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-success" onclick="decision33()">Use Air Cannon</button><button class="btn btn-info" onclick="decision34()">Use Stun Gun</button>', 'flex-container justify-space-around');
+} // end f25
+
+function decision31() { // player uses fire. lands a crit, killing the monster, but no health bonus
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 0) == false) {return;}
+  elemInv[0][1]--;
+
+  critAnimation();
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', 'As the bicorn kicks up another fierce wind gust, you throw the fire bottle at it. It shatters before reaching it\'s target, but the wind only fuels the fire as the bicorn is scorched, as you barely dive out of the way from the expanding blast. As you watch the bicorn dissolve, you think you see it containing some sort of item, but it also is burned in the blast. ');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision35()">Continue</button>');
+} // end f31
+
+function decision32() { // player uses ice, no effect, but no damage, retry
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 1) == false) {return;}
+  elemInv[1][1]--;
+
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', 'You attempt to use the freeze spray, but the gust of wind proves too difficult to get around. The good news is that because the bicorn had to actively defend your attack, there was no retaliation. The bad news is that the item had no effect, means its use was wasted. It would be a good idea to not try that again.');
+  appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision31()">Use fire bottle</button><button class="btn btn-primary" onclick="decision32()">Use freeze spray</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-success" onclick="decision33()">Use Air Cannon</button><button class="btn btn-info" onclick="decision34()">Use Stun Gun</button>', 'flex-container justify-space-around');
+} // end f32
+
+function decision33() { // player uses wind, -1 health, retry
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 2) == false) {return;}
+  elemInv[2][1]--;
+
+  playerHealth--;
+  drawHealthBar();
+
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', 'As you ready the wind cannon, the small, focused gust of you you produced is completely overwhelmed by the wind produced by the bicorn. While it prevented the wind from overwheling you completely, you take damage in the process. The bicorn clearly has an affinity for wind, so you should try something else.');
+  appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision31()">Use fire bottle</button><button class="btn btn-primary" onclick="decision32()">Use freeze spray</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-success" onclick="decision33()">Use Air Cannon</button><button class="btn btn-info" onclick="decision34()">Use Stun Gun</button>', 'flex-container justify-space-around');
+  appendOutputConsole('p', '-1 HEALTH', 'text-center game');
+} // end f33
+
+function decision34() { // player uses lightning. lands crit, health bonus
+  //make sure player has the item before clearing screen
+  if (inventoryCheck(elemInv, 3) == false) {return;}
+  elemInv[3][1]--;
+
+  critAnimation();
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', 'The lightning that emerges from the stun gun quickly pierces any wind defense the bicorn attempts to put up. Furthermore, its horns act like a lightning rod only further increasing the damage taken. You have found the monsters weak point, as it is so vulnerable to lightning that another use of the stun gun is not required; it simply collapses and dissolves on the spot.');
+  healthBonus();
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision35()">Continue</button>', 'flex container, justify-center');
+} // end f34
+
+function decision35() { // enncounter success, prelude to boss fight
+  gameConsole.innerHTML='';
+  appendOutputConsole('p', 'After defeating the bicorn you make your way to the building where you thought you heard the voices. Now there seems to be only one voice, a female with a strong, assertive tone. You enter the building, and as you enter, you try to figure out where this woman is. In the buildings foyer, you hear another large rumbling. Something is coming, and it is much bigger than the previous two encounters');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="decision36()">Continue</button>', 'flex container, justify-center');
+} // end f35
+
+function decision36() { // begin boss fight
 
 }
 
@@ -453,11 +514,11 @@ function critAnimation() {
   let critSound = new Audio('sound/persona5-crit.wav');
   critSound.play();
   jokerBox.classList.remove('hide-joker');
-  setTimeout(function() {jokerBox.classList.add('done-joker')}, 1000);
-  setTimeout(function() {jokerBox.classList.add('no-transition')}, 1020);
-  setTimeout(function() {jokerBox.classList.add('hide-joker')}, 1040);
-  setTimeout(function() {jokerBox.classList.remove('done-joker')}, 1060);
-  setTimeout(function() {jokerBox.classList.remove('no-transition')}, 1080);
+  setTimeout(function() {jokerBox.classList.add('done-joker');}, 1000);
+  setTimeout(function() {jokerBox.classList.add('no-transition');}, 1020);
+  setTimeout(function() {jokerBox.classList.add('hide-joker');}, 1040);
+  setTimeout(function() {jokerBox.classList.remove('done-joker');}, 1060);
+  setTimeout(function() {jokerBox.classList.remove('no-transition');}, 1080);
 }
 
 function inventoryCheck(invArr, item) {
