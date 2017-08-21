@@ -15,6 +15,10 @@ const blackBox = document.getElementById('blackBox');
 const inventoryButton = document.getElementById('inventoryButton');
 const inventoryBox = document.getElementById('inventoryBox');
 const jokerBox = document.getElementById('jokerBox');
+const leftButtonArea = document.getElementById('left-button-area');
+const bossBGM = new Audio('sound/villain.mp3');
+let musicControl = ''; // will be used for audio button once drawn
+
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
 let playerName = ''; // players name
 
@@ -23,6 +27,7 @@ let insertedElement = '';
 let elementTarget = '';
 let outputText = '';
 
+let enableMusic = true; // In case i want to turn off music
 let dialogueTime = ''; //used as set interval later
 let dialogueFlag = -1; //used to keep track of conversation steps
 let needClear = true; //used to avoid two straight dialogue draws
@@ -443,6 +448,17 @@ function decision35() { // enncounter success, prelude to boss fight
 function decision36() { // begin boss fight
 /* Boss fight mechanics: Boss will start with 3 health. Each round, its shield wil glow a color corresponding to an element. If the player picked the opposite color, he will do damage. If picks the same color, he will take damage. Anything else will have no effect */
   gameConsole.innerHTML='';
+
+  if(enableMusic = true) {
+    bossBGM.play(); // play boss music
+    insertedElement = document.createElement('button');
+    insertedElement.setAttribute('onclick', 'muteMusic()');
+    insertedElement.setAttribute('id', 'musicControl');
+    insertedElement.setAttribute('class', 'btn btn-info btn-block');
+    insertedElement.innerHTML = '<i class="fa fa-volume-off" aria-hidden="true"></i>';
+    leftButtonArea.appendChild(insertedElement);
+  }
+
   appendOutputConsole('p', '*Boss Fight*', 'text-center game');
   appendOutputConsole('h1', 'BERITH', 'text-center game');
   appendOutputConsole('p', 'Health: ' + bossHealth, 'text-center');
@@ -513,6 +529,12 @@ function decision42() { // Boss defeated
 
 function decision43() { // encounter mitsuru, end game
   gameConsole.innerHTML='';
+  if(enableMusic == true){ // stop music if its on
+    bossBGM.pause();
+    musicControl = document.getElementById('musicControl');
+    musicControl.classList.add('invisible');
+  }// end if
+
   appendOutputConsole('p', 'You look over to the woman and you are hit with a wave of exhaustion. All these encounters have clearly tired you out, and you cant go much farther. You drop to a knee, and as you do, the woman puts her hands on your shoulders. You look up at her; she has long, brunette hair and appears to be wearing what would appear to be a black battle suit except that on top of it she is wearing an extravagant whit fur coat. There is a fencing sword holstered inside her coat. One look at her face and you can tell she is some kind of leader, as she is exuding confidence and strength. She looks down to you and simply says, "My name is Mitsuru Kirijo, and I\'m going to get you out of here"');
   appendOutputConsole('p', 'TO BE CONTINUED...', 'text-center game');
 }
@@ -624,3 +646,13 @@ function healthBonus() {
     appendOutputConsole('p', '+1 HEALTH', 'game flex-container justify-center');
   }
 }
+
+function muteMusic() {
+  if(enableMusic==true) {
+    bossBGM.pause();
+    enableMusic = false;
+  } else {
+    bossBGM.play();
+    enableMusic = true;
+  } //end if
+} //end muteMusic
