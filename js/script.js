@@ -451,7 +451,7 @@ function decision36() { // begin boss fight
   currAffinity = Math.floor(Math.random() * 4);
   appendOutputConsole('p', 'The knight\'s shield is glowing ' + bossAffinity[currAffinity]);
   appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
-  appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
 } // end f36
 
 function decision41(item) { // Player used item, check affinity for result and redraw
@@ -468,7 +468,9 @@ function decision41(item) { // Player used item, check affinity for result and r
     appendOutputConsole('p', 'Boss is strong against this element!');
     appendOutputConsole('p', '-1 HEALTH', 'text-center game');
     appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
-    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    if(elemInv[0][1] + elemInv[1][1] + elemInv[2][1] + elemInv[3][1] == 0) { decision44(); return; }
+
 
   } else if ( (item == 0 && currAffinity == 1) || (item == 1 && currAffinity == 0) || (item == 2 && currAffinity == 3) || (item == 3 && currAffinity == 2) ) { // since opposite pairings are 0-2 and 1-3, we can just use remainder2 operator to check
     bossHealth--;
@@ -478,19 +480,22 @@ function decision41(item) { // Player used item, check affinity for result and r
     appendOutputConsole('p', 'You exploited a weakness and did some damage! But something is now different...');
     appendOutputConsole('p', 'The knight\'s shield is now glowing ' + bossAffinity[currAffinity]);
     appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
-    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    if(elemInv[0][1] + elemInv[1][1] + elemInv[2][1] + elemInv[3][1] == 0) { decision44(); return; }
+
   } else {
     decision41A();
     appendOutputConsole('p', 'The item had no effect. Try something else.');
     appendOutputConsole('p', 'The knight\'s shield is glowing ' + bossAffinity[currAffinity]);
     appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
-    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    if(elemInv[0][1] + elemInv[1][1] + elemInv[2][1] + elemInv[3][1] == 0) { decision44(); return; }
+
   } // end iff
 } //end f41
 
 function decision41A() { //boss redraw
 // check if player is out of items
-if(elemInv[0] + elemInv[1] + elemInv[2] + elemInv[3] == 0) { decision44(); }
 
   gameConsole.innerHTML='';
   appendOutputConsole('p', '*Boss Fight*', 'text-center game');
@@ -568,7 +573,11 @@ function pauseClick() {
 
 function showInventory() {
 
-  if (!(inventoryBox.classList.contains('hide-inventory'))) { return;}
+  if (!(inventoryBox.classList.contains('hide-inventory'))) {
+    inventoryBox.classList.add('hide-inventory');
+    inventoryBox.innerHTML = '';
+    return;
+  }
 
   inventoryBox.classList.remove('hide-inventory');
   elemInv.forEach( function(item, index) {
