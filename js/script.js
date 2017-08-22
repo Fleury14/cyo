@@ -125,31 +125,33 @@ function decision11A() {
 
 function decision11B() {
   playerName = prompt('Please input your name:'); // Get players name
+  playerName == '' ? prompt('I don\'t know anyone without a name. If you are not willing to disclose yours, I cannot help you') : alert('Name recieved');
   drawHealthBar(); //redraw healthbar with name
   dialogueFlag = 0; // initiate conversation chain
   gameConsole.innerHTML = ''; //clear screen
 
 
   console.log('interval set');
-  dialogueTime = setInterval( dial11B, 250);
+  dialogueTime = setInterval( dial11B, 250); // Interval time to check for input. Lowering increases response time, but will strain the browser
 
   function dial11B() { //dialogue chain start
 
 
-    switch(dialogueFlag) {
+    switch(dialogueFlag) { // Dialogue chain structure:
+      // Dialogue is checked every .25 seconds for a response
 
       case 0:
         console.log(dialogueCont);
-        if(dialogueShown == false) {
+        if(dialogueShown == false) { //  if the current dialogue hasn't been shown yet, show it
           dialogueText('"Teacher"' , 'Excellent. Now listen carefully. This room that you are in exists outside of normal space. It is a physical manifestation of your own consciousness. For some people it can be an elevator, for others a jail cell. In your case, since you are, and will be, constantly learning, this is a classroom. I am here to help you out of your current plight, but I only offer the tools to do so. The correct decisions will still need to be made by you.');
-          dialogueShown = true; }
+          dialogueShown = true; } // and then change the flag so the same dialogue doesnt get redisplayed over and over
 
-        if(dialogueCont == true) {
+        if(dialogueCont == true) { // clicking the continue button makes this flag true so this code executes if the person clicked the button
           console.log('true flag tripped');
-          dialogueFlag++;
-          dialogueShown = false;
+          dialogueFlag++; // increment the dialogue flag so it goes to the next case
+          dialogueShown = false; //reset flags
           dialogueCont = false;
-          needClear = false;
+          needClear = false; //notify if the next dialogue section will require the console text to be blacked out
         } //end if
         break; //break case 0
 
@@ -447,6 +449,8 @@ function decision35() { // enncounter success, prelude to boss fight
 
 function decision36() { // begin boss fight
 /* Boss fight mechanics: Boss will start with 3 health. Each round, its shield wil glow a color corresponding to an element. If the player picked the opposite color, he will do damage. If picks the same color, he will take damage. Anything else will have no effect */
+// The biggest challenge in this mechanic actually comes from not running out of items. It is possible to get bad RNG and force yourself to take damage to change the bosses afinity
+
   gameConsole.innerHTML='';
 
   if(enableMusic == true) {
@@ -461,10 +465,34 @@ function decision36() { // begin boss fight
 
   appendOutputConsole('p', '*Boss Fight*', 'text-center game');
   appendOutputConsole('h1', 'BERITH', 'text-center game');
-  appendOutputConsole('p', 'Health: ' + bossHealth, 'text-center');
+
+  let bossHealthBar = ''; // put a string together of hearts for boss health
+  for(let i=0; i<bossHealth; i++){
+    bossHealthBar += '<i class="fa fa-heart" aria-hidden="true"></i>';
+  }
+
+  let shieldColor = '';
+  switch (currAffinity) { // use the boss's affinity to determine the color of the shield being drawn
+    case 0:
+      shieldColor = 'text-danger';
+      break;
+    case 1:
+      shieldColor = 'text-info';
+      break;
+    case 2:
+      shieldColor = 'text-success';
+      break;
+    case 3:
+      shieldColor = 'text-warning';
+      break;
+  } // end switch
+  // draw shield with the color that he is strong against
+  appendOutputConsole('p', '<i class="fa fa-shield" aria-hidden="true"></i>', 'text-center boss-shield ' + shieldColor);
+
+  appendOutputConsole('p', 'Health: ' + bossHealthBar, 'game text-center');
   appendOutputConsole('p', 'This time, the shadow turns into a knight atop a floating horse, armed with a spear and shield. Of particular note is its shield: It is glowing a distinct color and you feel like this is going to be the key to the battle. You look over your inventory one last time and harden your resolve. One of you is walking away from this. ');
 
-  currAffinity = Math.floor(Math.random() * 4);
+  currAffinity = Math.floor(Math.random() * 4); //determine bosses affinity.
   appendOutputConsole('p', 'The knight\'s shield is glowing ' + bossAffinity[currAffinity]);
   appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
   appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
@@ -516,7 +544,30 @@ function decision41A() { //boss redraw
   gameConsole.innerHTML='';
   appendOutputConsole('p', '*Boss Fight*', 'text-center game');
   appendOutputConsole('h1', 'BERITH', 'text-center game');
-  appendOutputConsole('p', 'Health: ' + bossHealth, 'text-center');
+  let bossHealthBar = '';
+  for(let i=0; i<bossHealth; i++){
+    bossHealthBar += '<i class="fa fa-heart" aria-hidden="true"></i>';
+  } // end for
+
+  let shieldColor = '';
+  switch (currAffinity) { // use the boss's affinity to determine the color of the shield being drawn
+    case 0:
+      shieldColor = 'text-danger';
+      break;
+    case 1:
+      shieldColor = 'text-info';
+      break;
+    case 2:
+      shieldColor = 'text-success';
+      break;
+    case 3:
+      shieldColor = 'text-warning';
+      break;
+  } // end switch
+  // draw shield with the color that he is strong against
+  appendOutputConsole('p', '<i class="fa fa-shield" aria-hidden="true"></i>', 'text-center boss-shield ' + shieldColor);
+
+  appendOutputConsole('p', 'Health: ' + bossHealthBar, 'text-center game');
 } // f41a
 
 function decision42() { // Boss defeated
