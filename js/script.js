@@ -449,7 +449,7 @@ function decision36() { // begin boss fight
 /* Boss fight mechanics: Boss will start with 3 health. Each round, its shield wil glow a color corresponding to an element. If the player picked the opposite color, he will do damage. If picks the same color, he will take damage. Anything else will have no effect */
   gameConsole.innerHTML='';
 
-  if(enableMusic = true) {
+  if(enableMusic == true) {
     bossBGM.play(); // play boss music
     insertedElement = document.createElement('button');
     insertedElement.setAttribute('onclick', 'muteMusic()');
