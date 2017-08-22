@@ -630,24 +630,36 @@ function critAnimation() {
   setTimeout(function() {jokerBox.classList.remove('no-transition');}, 1080);
 }
 
-function inventoryCheck(invArr, item) {
-  if(invArr[item][1] === 0) {
+function inventoryCheck(invArr, item) { // makes sure that player has the item in question
+
+  let checkResult = invArr[item][1] == 0 ? true : false; // is the item count 0? (t/f)
+
+  if(checkResult) { // return false is they didnt posses the item, otherwise return true
     appendOutputConsole('p', 'You dont have any more of that item!', 'text-center dos');
     return false;}
   else {return true;}
 }
 
-function healthBonus() {
+function healthBonus() { // give the player 1 extra health provided they dont go above 4
   if (playerHealth < 4) {
     appendOutputConsole('p', 'After the monster disappears, a clear plastic bottle drops to the ground. How and why a monster like that was carrying a plastic bottle is mind-boggling, but as you go to pick it up, it emits an absolutely delicious scent. You can\'t help but to drink it immediately, and after doing so, you feel even stronger than before');
     playerHealth++;
-    console.log('ph:', playerHealth);
     drawHealthBar();
     appendOutputConsole('p', '+1 HEALTH', 'game flex-container justify-center');
   }
 }
 
-function muteMusic() {
+function muteMusic() { // functionality for the mute button
+
+  // enableMusic == true ? (
+  //   bossBGM.pause(),
+  //   enableMusic = false
+  // ) : (
+  //   bossBGM.play(),
+  //   enableMusic = true
+  // );
+  // This shows i can use ternary operators, but it gives a linter error
+
   if(enableMusic==true) {
     bossBGM.pause();
     enableMusic = false;
