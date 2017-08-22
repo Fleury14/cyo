@@ -115,7 +115,15 @@ body {
   background-color: #666;
 }
 
-/* End bottom styles */
+/* End middle styles */
+
+/* Styles for EVENTS */
+
+.boss-shield {
+  font-size: 4em;
+}
+
+/* End event styles */
 
 /* Begin dialogue box */
 
