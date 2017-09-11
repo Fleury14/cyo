@@ -236,14 +236,16 @@ body {
 
 .battle-box {
   width: 80%;
-  height: 80vh;
+  height: 90vh;
   z-index: 2;
   position: absolute;
-  top: 10vh;
+  top: 0;
   left: 10%;
+  transition: 0.5s all;
+  border: 1px solid #fff;
+  background-color: #222;
 }
 
 .hide-battle {
   left: -80%;
-  display: none;
 }
