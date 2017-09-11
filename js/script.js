@@ -537,6 +537,7 @@ function decision43() { // encounter mitsuru, end game
 
   appendOutputConsole('p', 'You look over to the woman and you are hit with a wave of exhaustion. All these encounters have clearly tired you out, and you cant go much farther. You drop to a knee, and as you do, the woman puts her hands on your shoulders. You look up at her; she has long, brunette hair and appears to be wearing what would appear to be a black battle suit except that on top of it she is wearing an extravagant whit fur coat. There is a fencing sword holstered inside her coat. One look at her face and you can tell she is some kind of leader, as she is exuding confidence and strength. She looks down to you and simply says, "My name is Mitsuru Kirijo, and I\'m going to get you out of here"');
   appendOutputConsole('p', 'TO BE CONTINUED...', 'text-center game');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="section200()">Continue</button>', 'flex-container justify-center');
 }
 
 function decision44() { //player ran out of items -- game over
@@ -668,3 +669,12 @@ function muteMusic() { // functionality for the mute button
     enableMusic = true;
   } //end if
 } //end muteMusic
+
+
+//// CHAPTER TWO START !!!!!
+
+function clearScreen() { //function to clear the console
+  gameConsole.innerHTML = '';
+  appendOutputConsole('p', 'Blah Blah Blah, talk talk talk, give the man a sword and lets fight.');
+  appendOutputConsole('p', 'Receieved Metal Sword', 'game flex-container justify-center');
+}
