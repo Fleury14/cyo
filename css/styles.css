@@ -197,6 +197,7 @@ body {
 
 .hide-inventory {
   transform: translateX(115%);
+  display: none;
 }
 
 /* End inventory */
@@ -218,6 +219,7 @@ body {
 
 .hide-joker {
   transform: translate(100%, -50%);
+  display: none;
 }
 
 .done-joker {
@@ -226,4 +228,22 @@ body {
 
 .no-transition {
   transition: 0s all;
+}
+
+/* End joker looking cool */
+
+/* Begin battle box */
+
+.battle-box {
+  width: 80%;
+  height: 80vh;
+  z-index: 2;
+  position: absolute;
+  top: 10vh;
+  left: 10%;
+}
+
+.hide-battle {
+  left: -80%;
+  display: none;
 }

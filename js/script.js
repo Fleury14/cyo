@@ -37,6 +37,7 @@ let dialogueShown = false; // used to determine if a dialogue has been drawn in 
 
 document.getElementById('intro-button').addEventListener('click', beginGame);
 document.getElementById('intro-button').addEventListener('touchstart', beginGame);
+document.querySelector('#ch2Skip').addEventListener('click', section200);
 
 drawHealthBar();
 
@@ -719,3 +720,16 @@ function muteMusic() { // functionality for the mute button
     enableMusic = true;
   } //end if
 } //end muteMusic
+
+// CHAPTER 2 !!!!!!
+
+function clearScreen() { //function to clear screens
+  gameConsole.innerHTML = '';
+}
+
+function section200() {
+  clearScreen();
+  appendOutputConsole('p', 'Blah blah blah talk talk talk give this man a sword and lets fight..');
+  appendOutputConsole('div', '<button class="btn btn-primary">Continue</button>', 'flex-container justify-center');
+  
+}
