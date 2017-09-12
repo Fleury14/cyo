@@ -43,6 +43,10 @@ body {
   margin: 0 auto;
 }
 
+.green-text {
+  color: #00ff00;
+}
+
 /* End Global, Begin header styles */
 
 .life-box {
@@ -248,4 +252,10 @@ body {
 
 .hide-battle {
   left: -80%;
+}
+
+.party-member-box {
+  height: 25vh;
+  color: #fff;
+  border: 1px solid #fff;
 }

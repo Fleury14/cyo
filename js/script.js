@@ -36,9 +36,7 @@ let dialogueCont = false; // used for the continue button in long conversation
 let dialogueShown = false; // used to determine if a dialogue has been drawn in conversations
 
 //CHAPTER 2 var declarations
-
-
-
+let party = [];
 //declare party members
 let protag = new partyMember('', 3, 'hS');
 
@@ -754,13 +752,39 @@ function showBattleScreen() {
 
 function beginBattleEngine(enemies) {
   showBattleScreen();
+  drawPartyHealth();
+
 }
+
+function drawPartyHealth() {
+  if(party.length == 1) {
+    $('#battleBox').append(`
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-4 col-sm-offset-4 party-member-box game text-center">
+            <p>${party[0].name}</p>
+            <p id="hp0-text">HP: ${party[0].currentHP}/${party[0].currentHP}</p>
+            <p id="mp0-text">MP: ${party[0].currentMP}/${party[0].currentMP}</p>
+          </div>
+        </div>
+      </div>
+    `);
+
+    if(party[0].currentHP / party[0].maxHP > 0.90) {
+      console.log('greentext triggered');
+      $('#hp0-text').addClass('green-text');
+    } //end health pct check
+  } //end party length 1 check
+
+} //end drawpartyhealth()
 
 function section200() { //begin chapter two
   clearScreen();
   appendOutputConsole('p', 'Blah blah blah talk talk talk give this man a sword and lets fight..');
   appendOutputConsole('div', '<button class="btn btn-primary" id="continue200">Continue</button>', 'flex-container justify-center');
-
+  protag.name = playerName; //set the playername in his object, and add him to the party
+  if(protag.name == '') {protag.name = 'Protag';}
+  party.push(protag);
 
   document.querySelector('#continue200').addEventListener('click', section201);
 }

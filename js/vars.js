@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 function partyMember(name, level, resist) { //constructor for party members
   this.name = name;
   this.level = level;
