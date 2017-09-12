@@ -15,6 +15,7 @@ const blackBox = document.getElementById('blackBox');
 const inventoryButton = document.getElementById('inventoryButton');
 const inventoryBox = document.getElementById('inventoryBox');
 const jokerBox = document.getElementById('jokerBox');
+const battleBox = document.querySelector('#battleBox');
 const leftButtonArea = document.getElementById('left-button-area');
 const bossBGM = new Audio('sound/villain.mp3');
 let musicControl = ''; // will be used for audio button once drawn
@@ -34,9 +35,27 @@ let needClear = true; //used to avoid two straight dialogue draws
 let dialogueCont = false; // used for the continue button in long conversation
 let dialogueShown = false; // used to determine if a dialogue has been drawn in conversations
 
+//CHAPTER 2 var declarations
+let party = [];
+let initialBattleDraw = true; //tells the function for drawing enemies if containers need to either be drawn initially, or reset in the battle box
+let battleOrder = [];
+//declare party members
+let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
+
+
+
+
+
+
+//declare enemies
+let enemyUkobach = new enemy('Ukobach', 50, 50, 'iW', [abilityList.agi], 2, 3, 2);
+
+
+battleBox.style.display = 'none';
 document.getElementById('intro-button').addEventListener('click', beginGame);
 document.getElementById('intro-button').addEventListener('touchstart', beginGame);
+document.querySelector('#ch2Skip').addEventListener('click', section200);
 
 drawHealthBar();
 
@@ -719,3 +738,145 @@ function muteMusic() { // functionality for the mute button
     enableMusic = true;
   } //end if
 } //end muteMusic
+
+// CHAPTER 2 !!!!!!
+
+function clearScreen() { //function to clear screens
+  gameConsole.innerHTML = '';
+}
+
+function showBattleScreen() {
+  battleBox.style.display = 'block';
+  battleBox.classList.remove('hide-battle');
+}
+
+// BATTLE ENGINE (IMPORTANT)
+
+function beginBattleEngine(enemies) {
+  initialBattleDraw = true;
+  showBattleScreen();
+  drawPartyHealth();
+  drawEnemies(enemies);
+  drawActionBars();
+  getBattleOrder(enemies);
+  let battleTurn = 0;
+  let battleComplete = false;
+}
+
+function drawPartyHealth() { //function for drawing the party health in battle
+  if(party.length == 1) { //if theres only 1 party member, draw health this way so its centered
+
+    if(initialBattleDraw == true) { //if this is the first draw, then add containers and the like
+      $('#battleBox').append(`
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-4 col-sm-offset-4 party-member-box game text-center">
+              <p>${party[0].name}</p>
+              <p id="hp0-text">HP: ${party[0].currentHP}/${party[0].currentHP}</p>
+              <p id="mp0-text">MP: ${party[0].currentMP}/${party[0].currentMP}</p>
+            </div>
+          </div>
+        </div>
+      `); //end append
+      // Note: The reason the flag isnt switched here is because on the first battle draw, the party members draw will always be followed by the enemy and action bar draw. Therefore, resettig the initial draw flag is done on the last function
+    } else { //otherwise just reset the content inside
+      $('.party-member-box').html(`
+        <p>${party[0].name}</p>
+        <p id="hp0-text">HP: ${party[0].currentHP}/${party[0].currentHP}</p>
+        <p id="mp0-text">MP: ${party[0].currentMP}/${party[0].currentMP}</p>
+      `); //end .html
+    } // end else
+    if(party[0].currentHP / party[0].maxHP > 0.90) {
+      $('#hp0-text').addClass('green-text');
+    } //end health pct check
+  } //end party length 1 check
+} //end drawpartyhealth()
+
+function drawEnemies(enemies) {
+  if(enemies.length == 1) {
+
+    if(initialBattleDraw==true) { //same as drawing party, check to see if this is the first draw
+      $('#battleBox').append(`
+        <div class="enemy-container game flex-container text-uppercase align-center">
+          <p>${enemies[0].name}</p>
+          <p id="enemy0-health-text">${Math.ceil(enemies[0].currentHP/enemies[0].maxHP * 100)}%</p>
+          <p id="battle-damage-text"></p>
+        </div>
+      `); // (if so, add containers) end append
+    } else { //if not, just edit the innermost HTML
+      $('.enemy-container').html(`
+        <p>${enemies[0].name}</p>
+        <p id="enemy0-health-text">${Math.ceil(enemies[0].currentHP/enemies[0].maxHP * 100)}%</p>
+        <p id="battle-damage-text"></p>
+      `);
+    } //end initial draw check
+    console.log(enemies);
+    let green = Math.ceil(enemies[0].currentHP/enemies[0].maxHP * 255);
+    let red = 255 - green;
+    document.querySelector('#enemy0-health-text').style.color = `rgb(${red}, ${green}, 0)`;
+    document.querySelector('#enemy0-health-text').style.fontSize = '4em';
+  } //end if
+} //end function drawEnemies()
+
+function drawActionBars() {
+  if(initialBattleDraw==true) {
+    $('#battleBox').append(`
+
+        <div class="row">
+          <div class="col-sm-3 col-sm-offset-1 action-box"></div>
+          <div class="col-sm-6 col-sm-offset-1 description-box"></div>
+        </div>
+
+    `);
+    initialBattleDraw=false;
+  } //end if
+} //end function drawactionbars
+
+function getBattleOrder(enemies) {
+  let finalResult=999;
+  let currentMaxAg=0;
+  let iteration = 0;
+
+  while(iteration<(party.length + enemies.length)) {
+
+    for(let i=0; i<party.length; i++) { //figure out party member with highest ag
+      if(party[i].ag>currentMaxAg && battleOrder.includes(i)==false ) {
+        currentMaxAg = party[i].ag;
+        finalResult = i;
+      } //end if
+    }//end for
+    let enemyResult = -1;
+    //console.log(`current max ag in party is ${party[finalResult].name} with a max ag of ${currentMaxAg}`);
+    for(let i=0; i<enemies.length; i++) {
+      if(enemies[i].ag>currentMaxAg && battleOrder.includes((i+1)*-1)==false){
+        currentMaxAg = enemies[i].ag;
+        finalResult = (i+1) * -1;
+      }
+    } //end For
+    console.log(`enemycheck complete`);
+    console.log(`end result is ${finalResult} and ag ${currentMaxAg}`);
+    currentMaxAg=0;
+    battleOrder.push(finalResult);
+    console.log(battleOrder);
+    iteration++;
+  }//end while
+
+} //end function getbattleorder
+
+function section200() { //begin chapter two
+  clearScreen();
+  appendOutputConsole('p', 'Blah blah blah talk talk talk give this man a sword and lets fight..');
+  appendOutputConsole('div', '<button class="btn btn-primary" id="continue200">Continue</button>', 'flex-container justify-center');
+  protag.name = playerName; //set the playername in his object, and add him to the party
+  if(protag.name == '') {protag.name = 'Protag';}
+  party.push(protag);
+
+  document.querySelector('#continue200').addEventListener('click', section201);
+}
+
+function section201() { //initial battle test
+  //declare monsters for fight
+
+  beginBattleEngine([enemyUkobach]);
+
+}
