@@ -38,6 +38,7 @@ let dialogueShown = false; // used to determine if a dialogue has been drawn in 
 //CHAPTER 2 var declarations
 let party = [];
 let initialBattleDraw = true; //tells the function for drawing enemies if containers need to either be drawn initially, or reset in the battle box
+let battleOrder = [];
 //declare party members
 let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
@@ -757,6 +758,9 @@ function beginBattleEngine(enemies) {
   drawPartyHealth();
   drawEnemies(enemies);
   drawActionBars();
+  getBattleOrder(enemies);
+  let battleTurn = 0;
+  let battleComplete = false;
 }
 
 function drawPartyHealth() { //function for drawing the party health in battle
@@ -824,8 +828,40 @@ function drawActionBars() {
         </div>
 
     `);
-  }
+    initialBattleDraw=false;
+  } //end if
 } //end function drawactionbars
+
+function getBattleOrder(enemies) {
+  let finalResult=999;
+  let currentMaxAg=0;
+  let iteration = 0;
+
+  while(iteration<(party.length + enemies.length)) {
+
+    for(let i=0; i<party.length; i++) { //figure out party member with highest ag
+      if(party[i].ag>currentMaxAg && battleOrder.includes(i)==false ) {
+        currentMaxAg = party[i].ag;
+        finalResult = i;
+      } //end if
+    }//end for
+    let enemyResult = -1;
+    //console.log(`current max ag in party is ${party[finalResult].name} with a max ag of ${currentMaxAg}`);
+    for(let i=0; i<enemies.length; i++) {
+      if(enemies[i].ag>currentMaxAg && battleOrder.includes((i+1)*-1)==false){
+        currentMaxAg = enemies[i].ag;
+        finalResult = (i+1) * -1;
+      }
+    } //end For
+    console.log(`enemycheck complete`);
+    console.log(`end result is ${finalResult} and ag ${currentMaxAg}`);
+    currentMaxAg=0;
+    battleOrder.push(finalResult);
+    console.log(battleOrder);
+    iteration++;
+  }//end while
+
+} //end function getbattleorder
 
 function section200() { //begin chapter two
   clearScreen();

@@ -105,4 +105,6 @@ function enemy(name, hp, mp, resist, abilities, str, mag, ag) {
   this.currentMP = mp;
   this.resistStr = resist;
   this.abilities = abilities;
+  this.mag = mag;
+  this.ag = ag;
 } //end enemy constructor
