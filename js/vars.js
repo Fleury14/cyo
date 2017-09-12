@@ -1,8 +1,11 @@
 /*jshint esversion: 6 */
 
-function partyMember(name, level, resist) { //constructor for party members
+function partyMember(name, level, resist, str, mag, ag) { //constructor for party members
   this.name = name;
   this.level = level;
+  this.str = str;
+  this.mag = mag;
+  this.ag = ag;
   this.maxHP = (100 + Math.round(level * 7 + (Math.random() * 4 * level) ));
   this.maxMP = (100 + Math.round(level * 6 + (Math.random() * 4 * level) ));
   this.currentHP = this.maxHP;
@@ -94,7 +97,7 @@ let abilityList = {
   }
 }; //end ability list
 
-function enemy(name, hp, mp, resist, abilities) {
+function enemy(name, hp, mp, resist, abilities, str, mag, ag) {
   this.name = name;
   this.maxHP = hp;
   this.currentHP = hp;

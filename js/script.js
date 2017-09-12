@@ -38,7 +38,7 @@ let dialogueShown = false; // used to determine if a dialogue has been drawn in 
 //CHAPTER 2 var declarations
 let party = [];
 //declare party members
-let protag = new partyMember('', 3, 'hS');
+let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
 
 
@@ -47,7 +47,7 @@ let protag = new partyMember('', 3, 'hS');
 
 
 //declare enemies
-let enemyUkobach = new enemy('Ukobach', 50, 50, 'iW', [abilityList.agi]);
+let enemyUkobach = new enemy('Ukobach', 50, 50, 'iW', [abilityList.agi], 2, 3, 2);
 
 
 battleBox.style.display = 'none';
@@ -753,11 +753,11 @@ function showBattleScreen() {
 function beginBattleEngine(enemies) {
   showBattleScreen();
   drawPartyHealth();
-
+  drawEnemies(enemies);
 }
 
-function drawPartyHealth() {
-  if(party.length == 1) {
+function drawPartyHealth() { //function for drawing the party health in battle
+  if(party.length == 1) { //if theres only 1 party member, draw health this way so its centered
     $('#battleBox').append(`
       <div class="container-fluid">
         <div class="row">
@@ -771,12 +771,23 @@ function drawPartyHealth() {
     `);
 
     if(party[0].currentHP / party[0].maxHP > 0.90) {
-      console.log('greentext triggered');
       $('#hp0-text').addClass('green-text');
     } //end health pct check
   } //end party length 1 check
-
 } //end drawpartyhealth()
+
+function drawEnemies(enemies) {
+  if(enemies.length == 1) {
+    $('#battleBox').append(`
+      <div class="enemy-container game flex-container text-uppercase align-center">
+        <p>${enemies[0].name}</p>
+        <p id="enemy0-health-text">${Math.ceil(enemies[0].currentHP/enemies[0].maxHP * 100)}%</p>
+        <p id="battle-damage-text"></p>
+      </div>
+    `); //end append
+    console.log(enemies);
+  } //end if
+} //end function drawEnemies()
 
 function section200() { //begin chapter two
   clearScreen();
