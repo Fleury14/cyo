@@ -10,6 +10,8 @@ function partyMember(name, level, resist, str, mag, ag) { //constructor for part
   this.maxMP = (100 + Math.round(level * 6 + (Math.random() * 4 * level) ));
   this.currentHP = this.maxHP;
   this.currentMP = this.maxMP;
+  this.weaponObj = '';
+  this.armorObj = '';
   this.currentWeapon = '';
   this.currentArmor = '';
   this.weaponPwr = 0;
@@ -22,14 +24,14 @@ let inventory = {
   weapons : {
     ironSword: {
       name: 'Iron Sword',
-      attackPow: '20',
+      attackPow: 15,
       numOwned: 0
     } //end ironsword
   }, //end weapons
   armor : {
     plainClothes: {
       name: 'Plain Clothes',
-      defensePow: '5',
+      defensePow: 5,
       numOwned: 0
     }
   }

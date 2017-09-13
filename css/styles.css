@@ -13,6 +13,7 @@
 body {
   margin: 0;
   background-color: #000;
+  overflow: hidden;
 }
 
 .invisible {
@@ -167,7 +168,6 @@ body {
 /* begin blacken box. this is used to hide the console when dialogue is posted */
 
 .blacken-box {
-  height: 100vh;
   width: 100%;
   position: absolute;
   background-color: rgba(0, 0, 0, 0);
@@ -279,4 +279,30 @@ body {
   background-color: #000;
   border: 1px solid #fff;
   border-radius: 5%;
+}
+
+.action-box {
+  padding-top: 10px;
+}
+
+.description-box {
+  color: #fff;
+  padding-top: 5px;
+}
+
+.action-row {
+  height: 50px;
+  color: #fff;
+
+}
+
+.arrow-box {
+  height: 50px;
+  width: 50px;
+  float: left;
+}
+
+.attack-target-box {
+  border: 2px dotted dodgerblue;
+  padding: 5px;
 }
