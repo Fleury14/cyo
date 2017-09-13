@@ -37,6 +37,7 @@ let dialogueShown = false; // used to determine if a dialogue has been drawn in 
 
 //CHAPTER 2 var declarations
 let party = [];
+let currentEnemies=[];
 let initialBattleDraw = true; //tells the function for drawing enemies if containers need to either be drawn initially, or reset in the battle box
 let battleOrder = [];
 //declare party members
@@ -753,7 +754,6 @@ function showBattleScreen() {
 // BATTLE ENGINE (IMPORTANT)
 
 function beginBattleEngine(enemies) {
-  initialBattleDraw = true;
   showBattleScreen();
   drawPartyHealth();
   drawEnemies(enemies);
@@ -761,12 +761,102 @@ function beginBattleEngine(enemies) {
   getBattleOrder(enemies);
   let battleTurn = 0;
   let battleComplete = false;
+  currentEnemies = enemies;
+
+  if(battleOrder[battleTurn] < 0) {battleEnemyturn(battleTurn);} else {battlePlayerTurn(battleTurn);}
+
+
+
+} //end begin battleengine
+
+function battlePlayerTurn(turn, enemies) { //function that runs when it is a partymembers turn
+  $('.action-box').html(`
+  <div class="action-row">
+    <div class="arrow-box" id="arrowBox0"></div>
+    <p>Fight</p>
+  </div>
+  <div class="action-row">
+    <div class="arrow-box" id="arrowBox1"></div>
+    <p>Item</p>
+  </div>
+  <div class="action-row">
+    <div class="arrow-box" id="arrowBox2"></div>
+    <p>Skill</p>
+  </div>
+
+    `);  //end append
+    let currentArrow = 0; //defaults to the top item on start
+
+    drawArrow();
+
+    function drawArrow() { // function to draw the arrow
+      for(i=0; i<3; i++) { //resets all arrow boxes
+        let loopTarget = 'arrowBox' + i; // note: because all boxes are labeled #arrowBox0 through arrowBox3, I can target individual boxes with concatenation -sic-
+        let loopElement = document.querySelector('#' + loopTarget);
+        loopElement.innerHTML = '';
+      }
+
+      let target = 'arrowBox' + currentArrow; // use the same technique to target a particular box with the var currentArrow
+      let element = document.querySelector('#' + target);
+      element.innerHTML = '<i class="fa fa-arrow-right" aria-hidden="true"></i>'; // ideally this would be an svg of an actual arrow LOL
+    }
+
+    window.addEventListener('keydown', function(e){
+        console.log(e); // listens for key presses
+
+      if(e.key == 'ArrowDown') { //if they push the down arrow....
+        currentArrow++; //increase the target by one
+        if(currentArrow==3) {currentArrow=0} //this if makes sure it wraps around after you hit the bottom
+        drawArrow(); //and redraw the arrow
+      }
+
+      if(e.key == 'ArrowUp') { // same thing, but going up this time
+        currentArrow--;
+        if(currentArrow==-1) {currentArrow=3}
+        drawArrow();
+      }
+
+      if(e.key == 'Enter') { //if they press enter...
+        switch(currentArrow) { //check and see what the arrow is currently set to and execute the appropriate alert
+          case 0:
+            playerFightDamage();
+            break;
+          case 1:
+            alert ('Item');
+            break;
+          case 2:
+            alert ('Skill');
+            break;
+
+        } //end switch
+      } //end if
+
+    }); // end eventlistener
 }
+
+function playerFightDamage() {
+  $('.description-box').html(`
+    <p class="text-center dos">Click or select a target</p>
+    <div class="flex-container" id="attack-target-container">
+    </div>
+    `); //end html
+
+  for(let i=0; i<currentEnemies.length; i++) {
+    console.log('appending...');
+    $('#attack-target-container').append(`
+      <div class="attack-target-box">
+        <div class="attack-target-arrow"></div>
+        <div class="attack-target-content">${currentEnemies[i].name}</div>
+      </div>
+      `);
+  } //end for
+} // end playerFightDamage
 
 function drawPartyHealth() { //function for drawing the party health in battle
   if(party.length == 1) { //if theres only 1 party member, draw health this way so its centered
 
-    if(initialBattleDraw == true) { //if this is the first draw, then add containers and the like
+    if(initialBattleDraw === true) { //if this is the first draw, then add containers and the like
+      console.log(`partyboxappendtriggered, ${initialBattleDraw}`);
       $('#battleBox').append(`
         <div class="container-fluid">
           <div class="row">
@@ -810,7 +900,7 @@ function drawEnemies(enemies) {
         <p id="battle-damage-text"></p>
       `);
     } //end initial draw check
-    console.log(enemies);
+    //console.log(enemies);
     let green = Math.ceil(enemies[0].currentHP/enemies[0].maxHP * 255);
     let red = 255 - green;
     document.querySelector('#enemy0-health-text').style.color = `rgb(${red}, ${green}, 0)`;
@@ -823,7 +913,7 @@ function drawActionBars() {
     $('#battleBox').append(`
 
         <div class="row">
-          <div class="col-sm-3 col-sm-offset-1 action-box"></div>
+          <div class="col-sm-3 col-sm-offset-1 action-box game"></div>
           <div class="col-sm-6 col-sm-offset-1 description-box"></div>
         </div>
 
@@ -853,11 +943,11 @@ function getBattleOrder(enemies) {
         finalResult = (i+1) * -1;
       }
     } //end For
-    console.log(`enemycheck complete`);
-    console.log(`end result is ${finalResult} and ag ${currentMaxAg}`);
+    //console.log(`enemycheck complete`);
+    //console.log(`end result is ${finalResult} and ag ${currentMaxAg}`);
     currentMaxAg=0;
     battleOrder.push(finalResult);
-    console.log(battleOrder);
+    //console.log(battleOrder);
     iteration++;
   }//end while
 
