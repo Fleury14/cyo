@@ -283,7 +283,11 @@ body {
 
 .action-box {
   padding-top: 10px;
+}
 
+.description-box {
+  color: #fff;
+  padding-top: 5px;
 }
 
 .action-row {
@@ -296,4 +300,9 @@ body {
   height: 50px;
   width: 50px;
   float: left;
+}
+
+.attack-target-box {
+  border: 2px dotted dodgerblue;
+  padding: 5px;
 }

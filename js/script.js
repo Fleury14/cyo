@@ -18,6 +18,7 @@ const jokerBox = document.getElementById('jokerBox');
 const battleBox = document.querySelector('#battleBox');
 const leftButtonArea = document.getElementById('left-button-area');
 const bossBGM = new Audio('sound/villain.mp3');
+const willpowerBGM = new Audio('sound/willpower.mp3');
 let musicControl = ''; // will be used for audio button once drawn
 
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
@@ -40,6 +41,7 @@ let party = [];
 let currentEnemies=[];
 let initialBattleDraw = true; //tells the function for drawing enemies if containers need to either be drawn initially, or reset in the battle box
 let battleOrder = [];
+let currentTurn = 0; //determines whose turn i t is in battle
 //declare party members
 let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
@@ -754,90 +756,99 @@ function showBattleScreen() {
 // BATTLE ENGINE (IMPORTANT)
 
 function beginBattleEngine(enemies) {
-  showBattleScreen();
-  drawPartyHealth();
-  drawEnemies(enemies);
-  drawActionBars();
-  getBattleOrder(enemies);
-  let battleTurn = 0;
-  let battleComplete = false;
   currentEnemies = enemies;
 
-  if(battleOrder[battleTurn] < 0) {battleEnemyturn(battleTurn);} else {battlePlayerTurn(battleTurn);}
+  showBattleScreen(); //show the battle box
+  drawPartyHealth(); //draw the party health bars
+  drawEnemies(enemies); //draw the enemy section
+  drawActionBars(); //draw the bottom bars
+  getBattleOrder(enemies); // get the turn order based on agility
+  let battleTurn = 0;
+  let battleComplete = false;
 
-
+  if(battleOrder[battleTurn] < 0) {battleEnemyturn(battleTurn);} else {battlePlayerTurn(battleOrder[battleTurn]);}
 
 } //end begin battleengine
 
 function battlePlayerTurn(turn, enemies) { //function that runs when it is a partymembers turn
+  currentTurn = turn; // note the persons turn globally
   $('.action-box').html(`
-  <div class="action-row">
+  <div class="action-row" id="commandRow0">
     <div class="arrow-box" id="arrowBox0"></div>
     <p>Fight</p>
   </div>
-  <div class="action-row">
+  <div class="action-row" id="commandRow1">
     <div class="arrow-box" id="arrowBox1"></div>
     <p>Item</p>
   </div>
-  <div class="action-row">
+  <div class="action-row" id="commandRow2">
     <div class="arrow-box" id="arrowBox2"></div>
     <p>Skill</p>
   </div>
 
     `);  //end append
-    let currentArrow = 0; //defaults to the top item on start
 
     drawArrow();
 
-    function drawArrow() { // function to draw the arrow
-      for(i=0; i<3; i++) { //resets all arrow boxes
-        let loopTarget = 'arrowBox' + i; // note: because all boxes are labeled #arrowBox0 through arrowBox3, I can target individual boxes with concatenation -sic-
-        let loopElement = document.querySelector('#' + loopTarget);
-        loopElement.innerHTML = '';
-      }
+    window.addEventListener('keydown', commandBox); // allow keyboard and mouse countrols for command box
+    document.querySelector('#commandRow0').addEventListener('click', playerFightTarget);
+} //end battleplayerturn
 
-      let target = 'arrowBox' + currentArrow; // use the same technique to target a particular box with the var currentArrow
-      let element = document.querySelector('#' + target);
-      element.innerHTML = '<i class="fa fa-arrow-right" aria-hidden="true"></i>'; // ideally this would be an svg of an actual arrow LOL
-    }
+function drawArrow() { // function to draw the arrow
+  for(i=0; i<3; i++) { //resets all arrow boxes
+    let loopTarget = 'arrowBox' + i; // note: because all boxes are labeled #arrowBox0 through arrowBox3, I can target individual boxes with concatenation -sic-
+    let loopElement = document.querySelector('#' + loopTarget);
+    loopElement.innerHTML = '';
+  }
 
-    window.addEventListener('keydown', function(e){
-        console.log(e); // listens for key presses
+  let target = 'arrowBox' + currentArrow; // use the same technique to target a particular box with the var currentArrow
+  let element = document.querySelector('#' + target);
+  element.innerHTML = '<i class="fa fa-arrow-right" aria-hidden="true"></i>'; // ideally this would be an svg of an actual arrow LOL
 
-      if(e.key == 'ArrowDown') { //if they push the down arrow....
-        currentArrow++; //increase the target by one
-        if(currentArrow==3) {currentArrow=0} //this if makes sure it wraps around after you hit the bottom
-        drawArrow(); //and redraw the arrow
-      }
+} //end for
 
-      if(e.key == 'ArrowUp') { // same thing, but going up this time
-        currentArrow--;
-        if(currentArrow==-1) {currentArrow=3}
-        drawArrow();
-      }
+let currentArrow = 0; //defaults to the top item on start (had to scope it outside)
 
-      if(e.key == 'Enter') { //if they press enter...
-        switch(currentArrow) { //check and see what the arrow is currently set to and execute the appropriate alert
-          case 0:
-            playerFightDamage();
-            break;
-          case 1:
-            alert ('Item');
-            break;
-          case 2:
-            alert ('Skill');
-            break;
+let commandBox = function(e){
+    console.log(e); // listens for key presses
 
-        } //end switch
-      } //end if
 
-    }); // end eventlistener
-}
+  if(e.key == 'ArrowDown') { //if they push the down arrow....
+    currentArrow++; //increase the target by one
+    if(currentArrow==3) {currentArrow=0} //this if makes sure it wraps around after you hit the bottom
+    drawArrow(); //and redraw the arrow
+  }
 
-function playerFightDamage() {
+  if(e.key == 'ArrowUp') { // same thing, but going up this time
+    currentArrow--;
+    if(currentArrow==-1) {currentArrow=2}
+    drawArrow();
+  }
+
+  if(e.key == 'Enter') { //if they press enter...
+    switch(currentArrow) { //check and see what the arrow is currently set to and execute the appropriate alert
+      case 0:
+        let target = playerFightTarget('wpnatk');
+        break;
+      case 1:
+        alert ('Item');
+        break;
+      case 2:
+        alert ('Skill');
+        break;
+
+    } //end switch
+  } //end if
+
+}; // end commandbox
+
+function playerFightTarget(type) { // function to select a target
+  window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
+  if(this.id=='commandRow0') {type = 'wpnatk';} // since values cant pe passed in event listeners without activating it, use 'this' to determine which row was selected therefore the attack type
+  console.log(type);
   $('.description-box').html(`
     <p class="text-center dos">Click or select a target</p>
-    <div class="flex-container" id="attack-target-container">
+    <div class="flex-container justify-space-around" id="attack-target-container">
     </div>
     `); //end html
 
@@ -846,11 +857,63 @@ function playerFightDamage() {
     $('#attack-target-container').append(`
       <div class="attack-target-box">
         <div class="attack-target-arrow"></div>
-        <div class="attack-target-content">${currentEnemies[i].name}</div>
+        <div class="attack-target-content${i}">${currentEnemies[i].name}</div>
       </div>
       `);
+      document.querySelector('.attack-target-content' + i).addEventListener('click', function() {
+        //console.log(`enemy ${i} selected`);
+        $('.description-box').html(``);
+        attackEnemy(i, type);
+      });//end event listener
   } //end for
+  $('#attack-target-container').append(`
+    <div class="attack-target-box">
+      <div class="attack-target-arrow"></div>
+      <div class="attack-target-cancel">Cancel</div>
+    </div>
+    `);
+    document.querySelector('.attack-target-cancel').addEventListener('click', function() { //in the event they cancel the target selection
+      $('.description-box').html(``); // clear the description-box
+      window.addEventListener('keydown', commandBox); //re-add mouse and keyboard listeneres for command box
+      document.querySelector('#commandRow0').addEventListener('click', playerFightTarget);
+    }); //end cancel event listener
 } // end playerFightDamage
+
+function attackEnemy(target, type) { //an action has been selected, and now a target has been selected
+  console.log(`attack ${type}triggered on ${target}`);
+  switch(type) {
+    case 'wpnatk':
+      let resistMod = 0;
+      // determine damage, get variables first to make this easier to analyze later
+      let level = party[currentTurn].level; // get actors level
+      let str = party[currentTurn].str; //get actors strength star
+      let wpnPow = party[currentTurn].weaponPwr // get power of equipped weaponPwr
+      let damageMod = (Math.random() * 0.1) + 0.95; // random damage modifier, can be anwhere from 95% to 105%
+      if(currentEnemies[target].resistStr.includes('pS') == true) { //check for physical resistence strength
+        resistMod = 0.5; //50% damage reduction if strong against
+      } else if (currentEnemies[target].resistStr.includes('pW') == true) { //check for weakness
+        resistMod = 1.5 //50% damage boost
+      } else if (currentEnemies[target].resistStr.includes('pN') == true)  {// check for null resist
+        resistMod = 0; //100% damage resist
+      } else if (currentEnemies[target].resistStr.includes('pD') == true)  {//check for drain phys
+        resistMod = -0.75; //75% damage drained
+      } else {
+        resistMod = 1; //no change
+      }
+      let critCheck = Math.random();
+      let critMod = critCheck > 0.9 ? 1.5 : 1.0;
+      //DAMAGE FORUMLA
+      let damage = 5 * Math.sqrt(level * (str + wpnPow) ) * damageMod * resistMod * critMod;
+
+      //apply damage
+      currentEnemies[target].currentHP -= damage;
+      drawEnemies(); //redraw enemies
+      $('#battle-damage-text' + target).html(`
+        <p class="game">${party[currentTurn]} just did ${damage} damage!</p>
+        `);
+
+  } //end switch
+}
 
 function drawPartyHealth() { //function for drawing the party health in battle
   if(party.length == 1) { //if theres only 1 party member, draw health this way so its centered
@@ -883,28 +946,28 @@ function drawPartyHealth() { //function for drawing the party health in battle
 } //end drawpartyhealth()
 
 function drawEnemies(enemies) {
-  if(enemies.length == 1) {
+  if(currentEnemies.length == 1) {
 
     if(initialBattleDraw==true) { //same as drawing party, check to see if this is the first draw
       $('#battleBox').append(`
         <div class="enemy-container game flex-container text-uppercase align-center">
-          <p>${enemies[0].name}</p>
-          <p id="enemy0-health-text">${Math.ceil(enemies[0].currentHP/enemies[0].maxHP * 100)}%</p>
-          <p id="battle-damage-text"></p>
+          <p>${currentEnemies[0].name}</p>
+          <p id="enemy-health-text0">${Math.ceil(currentEnemies[0].currentHP/currentEnemies[0].maxHP * 100)}%</p>
+          <p id="battle-damage-text0"></p>
         </div>
       `); // (if so, add containers) end append
     } else { //if not, just edit the innermost HTML
       $('.enemy-container').html(`
-        <p>${enemies[0].name}</p>
-        <p id="enemy0-health-text">${Math.ceil(enemies[0].currentHP/enemies[0].maxHP * 100)}%</p>
-        <p id="battle-damage-text"></p>
+        <p>${currentEnemies[0].name}</p>
+        <p id="enemy-health-text0">${Math.ceil(currentEnemies[0].currentHP/currentEnemies[0].maxHP * 100)}%</p>
+        <p id="battle-damage-text0"></p>
       `);
     } //end initial draw check
     //console.log(enemies);
-    let green = Math.ceil(enemies[0].currentHP/enemies[0].maxHP * 255);
+    let green = Math.ceil(currentEnemies[0].currentHP/currentEnemies[0].maxHP * 255);
     let red = 255 - green;
-    document.querySelector('#enemy0-health-text').style.color = `rgb(${red}, ${green}, 0)`;
-    document.querySelector('#enemy0-health-text').style.fontSize = '4em';
+    document.querySelector('#enemy-health-text0').style.color = `rgb(${red}, ${green}, 0)`;
+    document.querySelector('#enemy-health-text0').style.fontSize = '4em';
   } //end if
 } //end function drawEnemies()
 
@@ -914,7 +977,7 @@ function drawActionBars() {
 
         <div class="row">
           <div class="col-sm-3 col-sm-offset-1 action-box game"></div>
-          <div class="col-sm-6 col-sm-offset-1 description-box"></div>
+          <div class="col-sm-6 col-sm-offset-1 dos description-box"></div>
         </div>
 
     `);
@@ -959,6 +1022,13 @@ function section200() { //begin chapter two
   appendOutputConsole('div', '<button class="btn btn-primary" id="continue200">Continue</button>', 'flex-container justify-center');
   protag.name = playerName; //set the playername in his object, and add him to the party
   if(protag.name == '') {protag.name = 'Protag';}
+  // give protag basic weapon and armor and equip
+  protag.weaponObj = 'ironSword';
+  protag.armorObj = 'plainClothes';
+  protag.currentWeapon = inventory.weapons[protag.weaponObj].name;
+  protag.currentArmor = inventory.armor[protag.armorObj].name;
+  protag.weaponPwr = inventory.weapons[protag.weaponObj].attackPow;
+  protag.armorPwr = inventory.weapons[protag.weaponObj].defensePow;
   party.push(protag);
 
   document.querySelector('#continue200').addEventListener('click', section201);
@@ -966,6 +1036,8 @@ function section200() { //begin chapter two
 
 function section201() { //initial battle test
   //declare monsters for fight
+  willpowerBGM.play();
+
 
   beginBattleEngine([enemyUkobach]);
 
