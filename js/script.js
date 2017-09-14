@@ -52,7 +52,7 @@ let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
 
 //declare enemies
-let enemyUkobach = new enemy('Ukobach', 50, 50, 'iW', [abilityList.agi], 2, 3, 2);
+let enemyUkobach = new enemy('Ukobach', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2);
 
 
 battleBox.style.display = 'none';
@@ -778,6 +778,10 @@ function section200() { //begin chapter two
   inventory.battleItems.freezeSpray.numOwned += elemInv[1][1];
   inventory.battleItems.airCannon.numOwned += elemInv[2][1];
   inventory.battleItems.stunGun.numOwned += elemInv[3][1];
+  //give protag 3 skills (garu, dia, strong strike)
+  protag.abilityList.garu = abilityList.garu;
+  protag.abilityList.dia = abilityList.dia;
+  protag.abilityList.strongStrike = abilityList.strongStrike;
   party.push(protag);
 
   document.querySelector('#continue200').addEventListener('click', section201);

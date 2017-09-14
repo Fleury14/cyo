@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 // BATTLE ENGINE (IMPORTANT)
 
 function beginBattleEngine(enemies) {
@@ -58,12 +59,12 @@ let commandBox = function(e){
     console.log(e); // listens for key presses
   if(e.key == 'ArrowDown') { //if they push the down arrow....
     currentArrow++; //increase the target by one
-    if(currentArrow==3) {currentArrow=0} //this if makes sure it wraps around after you hit the bottom
+    if(currentArrow==3) {currentArrow=0;} //this if makes sure it wraps around after you hit the bottom
     drawArrow(); //and redraw the arrow
   }
   if(e.key == 'ArrowUp') { // same thing, but going up this time
     currentArrow--;
-    if(currentArrow==-1) {currentArrow=2}
+    if(currentArrow==-1) {currentArrow=2;}
     drawArrow();
   }
   if(e.key == 'Enter') { //if they press enter...
@@ -75,7 +76,7 @@ let commandBox = function(e){
         useItem();
         break;
       case 2:
-        alert ('Skill');
+        useSkill();
         break;
 
     } //end switch
@@ -83,10 +84,14 @@ let commandBox = function(e){
 
 }; // end commandbox
 
+//TYPES OF ATTACKS TO PASS TO TARGET
+// 'wpnatk' -- basic fight command
+// 'elem1x' -- level 1 elemental item with x being the element type
+
 function playerFightTarget(type) { // function to select a target
-  window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
-  if(this.id=='commandRow0') {type = 'wpnatk';} // since values cant pe passed in event listeners without activating it, use 'this' to determine which row was selected therefore the attack type
   console.log(type);
+  if(this.id=='commandRow0') {type = 'wpnatk';} // since values cant pe passed in event listeners without activating it, use 'this' to determine which row was selected therefore the attack type
+  window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
   $('.description-box').html(`
     <p class="text-center dos">Click or select a target</p>
     <div class="flex-container justify-space-around" id="attack-target-container">
@@ -94,7 +99,7 @@ function playerFightTarget(type) { // function to select a target
     `); //end html
 
   for(let i=0; i<currentEnemies.length; i++) {
-    console.log('appending...');
+    //console.log('appending...');
     $('#attack-target-container').append(`
       <div class="attack-target-box">
         <div class="attack-target-arrow"></div>
@@ -122,6 +127,7 @@ function playerFightTarget(type) { // function to select a target
 
 function attackEnemy(target, type) { //an action has been selected, and now a target has been selected
   console.log(`attack ${type}triggered on ${target}`);
+  let damage = 0;
   switch(type) {
     case 'wpnatk':
       $('.description-box').html(`${party[currentTurn].name} is attacking...`);
@@ -129,12 +135,12 @@ function attackEnemy(target, type) { //an action has been selected, and now a ta
       // determine damage, get variables first to make this easier to analyze later
       let level = party[currentTurn].level; // get actors level
       let str = party[currentTurn].str; //get actors strength star
-      let wpnPow = party[currentTurn].weaponPwr // get power of equipped weaponPwr
+      let wpnPow = party[currentTurn].weaponPwr; // get power of equipped weaponPwr
       let damageMod = (Math.random() * 0.1) + 0.95; // random damage modifier, can be anwhere from 95% to 105%
       if(currentEnemies[target].resistStr.includes('pS') == true) { //check for physical resistence strength
         resistMod = 0.5; //50% damage reduction if strong against
       } else if (currentEnemies[target].resistStr.includes('pW') == true) { //check for weakness
-        resistMod = 1.5 //50% damage boost
+        resistMod = 1.5; //50% damage boost
       } else if (currentEnemies[target].resistStr.includes('pN') == true)  {// check for null resist
         resistMod = 0; //100% damage resist
       } else if (currentEnemies[target].resistStr.includes('pD') == true)  {//check for drain phys
@@ -145,7 +151,7 @@ function attackEnemy(target, type) { //an action has been selected, and now a ta
       let critCheck = Math.random();
       let critMod = critCheck > 0.9 ? 1.5 : 1.0;
       //DAMAGE FORUMLA
-      let damage = 5 * Math.sqrt(level * (str + wpnPow) ) * damageMod * resistMod * critMod;
+      damage = 5 * Math.sqrt(level * (str + wpnPow) ) * damageMod * resistMod * critMod;
       damage = Math.round(damage);
 
       //apply damage, use a time out for effect
@@ -158,6 +164,38 @@ function attackEnemy(target, type) { //an action has been selected, and now a ta
         if(critMod>1){$('battle-damage-text' + target).append(`<p>Critical Hit</p>`);}
         nextTurn(); // next persons turn
       }, 1000); //1s delay on damage draw.
+      break;
+    case 'elem1f':
+    case 'elem1i':
+    case 'elem1w':
+    case 'elem1l':
+      $('.description-box').html(`${party[currentTurn].name} uses an elemental item`);
+      damage = 50; //base 50 damage for level 1 elemental items
+      let elementFor = type.charAt(type.length-1); //get the element type from the string
+      //check the enemy targets resistance str for any damage modifiers
+      if(currentEnemies[target].resistStr.includes(`${elementFor}W`) == true) { //weak agasint
+        damage *= 1.5; //50% bonus
+        $('.description-box').append(`<p>You exploited a weakness!!</p>`);
+      } else if (currentEnemies[target].resistStr.includes(`${elementFor}S`) == true) { //strong against
+        damage *= 0.5; //50% penalty
+        $('.description-box').append(`<p>It's strong against that element...</p>`);
+      } else if(currentEnemies[target].resistStr.includes(`${elementFor}N`) == true) { //nulls element
+        damage = 0; //100% penalty
+        $('.description-box').append(`<p>It blocks that element completely</p>`);
+      } else if(currentEnemies[target].resistStr.includes(`${elementFor}D`) == true) {//drains element
+        damage *= -0.75; //enemy is healed for 75% of the damage
+      }
+      //apply damage, use a time out for effect
+      setTimeout(function() {
+        currentEnemies[target].currentHP -= damage;
+        drawEnemies(); //redraw enemies
+        $('#battle-damage-text' + target).html(`
+          <p class="game">${party[currentTurn].name} just did ${damage} damage!</p>
+          `);
+        nextTurn(); // next persons turn
+      }, 1000); //1s delay on damage draw.
+      break;
+
   } //end switch
 } //end attack enemy
 
@@ -263,13 +301,14 @@ function getBattleOrder(enemies) {
 } //end function getbattleorder
 
 function useItem() { //function when player selects item from the command list
- inventoryBox.innerHTML = '';
+ $(inventoryBox).html(`Click on an item to select it`);
  let inventoryBoxId = 0;
  inventoryBox.classList.remove('hide-inventory');
  window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
  for (let item in inventory.battleItems) { //use for in to cycle through inventory items and display anything > 0
    if(inventory.battleItems[item].numOwned>0) {
-     $(inventoryBox).append(`<p id="invMenu${inventoryBoxId}">${inventory.battleItems[item].name}: ${inventory.battleItems[item].numOwned}</p>`);
+     $(inventoryBox).append(`<p id="invMenu${inventoryBoxId}" class="${item}">${inventory.battleItems[item].name}: ${inventory.battleItems[item].numOwned}</p>`);
+     document.querySelector('#invMenu' + inventoryBoxId).addEventListener('click', selectItem); // then ad a listener to each Item
      inventoryBoxId++;
    }
  } //end for in
@@ -282,5 +321,53 @@ function cancelItem() {
   inventoryBox.classList.add('hide-inventory'); //shift box over
   let inventoryDelay = setTimeout(function() {inventoryBox.innerHTML = '';}, 250); // empty content
   window.addEventListener('keydown', commandBox); // allow keyboard and mouse countrols for command box
+
+} //end cancel item
+
+function selectItem(event) { //after a user clicks on an item, the appropriate action for each item must be determined
+    console.log(event.target.className);
+    let currentItemObj = {};
+    inventoryBox.classList.add('hide-inventory'); //shift box over
+
+    for (let item in inventory.battleItems) { //going to use for..in to cycle through items and mark when its a match. each item has been given a class name that should match up to the item in the inventory object
+      if(event.target.className == item) { //now that we've matched it up, lets create an object with all the necessary info
+        console.log(`item ${item} matches up with clicked event ${event.target.className}. we did it!`);
+        inventory.battleItems[item].numOwned--;
+        switch(item) {
+          case 'fireBottle':
+            playerFightTarget('elem1f');
+            break;
+          case 'freezeSpray':
+            playerFightTarget('elem1i');
+            break;
+          case 'airCannon':
+            playerFightTarget('elem1w');
+            break;
+          case 'stunGun':
+            playerFightTarget('elem1l');
+            break;
+        }
+      }//end if
+    }//end for..in
+} //end selectItem
+
+function useSkill() { //player selected skill on the command menu. we will use the inventory box for this.
+  $(inventoryBox).html(`Click on an item to select it`); // clear inventory box and add header
+  let inventoryBoxId = 0;
+  inventoryBox.classList.remove('hide-inventory');
+  window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
+  $(inventoryBox).append(`
+    <div class="container" id="skillList">
+      <div class="row">
+        <div class="col-sm-2 text-center game">Elem</div>
+        <div class="col-sm-3 text-center game">Name</div>
+        <div class="col-sm-2 text-center game">Cost</div>
+        <div class="col-sm-5 text-center game">Description</div>
+      </div>
+    </div>
+    `);
+  for(let ability in party[currentTurn].abilityList) {
+    console.log(ability);
+  }
 
 }
