@@ -904,16 +904,17 @@ function attackEnemy(target, type) { //an action has been selected, and now a ta
       let critMod = critCheck > 0.9 ? 1.5 : 1.0;
       //DAMAGE FORUMLA
       let damage = 5 * Math.sqrt(level * (str + wpnPow) ) * damageMod * resistMod * critMod;
-
+      damage = Math.round(damage);
       //apply damage
       currentEnemies[target].currentHP -= damage;
       drawEnemies(); //redraw enemies
       $('#battle-damage-text' + target).html(`
-        <p class="game">${party[currentTurn]} just did ${damage} damage!</p>
+        <p class="game">${party[currentTurn].name} just did ${damage} damage!</p>
         `);
-
+      if(critmod>1){$('battle-damage-text' + target).append(`<p>Critical Hit</p>`);}
+      nextTurn(); // next persons turn
   } //end switch
-}
+} //end attack enemy
 
 function drawPartyHealth() { //function for drawing the party health in battle
   if(party.length == 1) { //if theres only 1 party member, draw health this way so its centered

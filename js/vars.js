@@ -33,8 +33,38 @@ let inventory = {
       name: 'Plain Clothes',
       defensePow: 5,
       numOwned: 0
-    }
-  }
+    } //end plainclothes
+  } //end armor
+  battle-items : {
+    fireBottle: {
+      name: 'Fire Bottle',
+      type: 'element-item',
+      damage: 50,
+      element: 'f',
+      numOwned: 0;
+    } //end fireBottle
+    freezeSpray: {
+      name: 'Freeze Spray',
+      type: 'element-item',
+      damage: 50,
+      element: 'i',
+      numOwned: 0;
+    } //end freezeSpray
+    airCannon: {
+      name: 'Air Cannon',
+      type: 'element-item',
+      damage: 50,
+      element: 'w',
+      numOwned: 0;
+    } //end airCannon
+    stunGun: {
+      name: 'Stun Gun',
+      type: 'element-item',
+      damage: 50,
+      element: 'l',
+      numOwned: 0;
+    } //end stunGun
+  } //end battleitems
 }; //end inventory
 
 // ability notes: attacktype: 1 - magical, 0 - physical
