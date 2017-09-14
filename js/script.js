@@ -815,13 +815,13 @@ let commandBox = function(e){
 
   if(e.key == 'ArrowDown') { //if they push the down arrow....
     currentArrow++; //increase the target by one
-    if(currentArrow==3) {currentArrow=0} //this if makes sure it wraps around after you hit the bottom
+    if(currentArrow==3) {currentArrow=0;} //this if makes sure it wraps around after you hit the bottom
     drawArrow(); //and redraw the arrow
   }
 
   if(e.key == 'ArrowUp') { // same thing, but going up this time
     currentArrow--;
-    if(currentArrow==-1) {currentArrow=2}
+    if(currentArrow==-1) {currentArrow=2;}
     drawArrow();
   }
 
@@ -887,12 +887,12 @@ function attackEnemy(target, type) { //an action has been selected, and now a ta
       // determine damage, get variables first to make this easier to analyze later
       let level = party[currentTurn].level; // get actors level
       let str = party[currentTurn].str; //get actors strength star
-      let wpnPow = party[currentTurn].weaponPwr // get power of equipped weaponPwr
+      let wpnPow = party[currentTurn].weaponPwr; // get power of equipped weaponPwr
       let damageMod = (Math.random() * 0.1) + 0.95; // random damage modifier, can be anwhere from 95% to 105%
       if(currentEnemies[target].resistStr.includes('pS') == true) { //check for physical resistence strength
         resistMod = 0.5; //50% damage reduction if strong against
       } else if (currentEnemies[target].resistStr.includes('pW') == true) { //check for weakness
-        resistMod = 1.5 //50% damage boost
+        resistMod = 1.5; //50% damage boost
       } else if (currentEnemies[target].resistStr.includes('pN') == true)  {// check for null resist
         resistMod = 0; //100% damage resist
       } else if (currentEnemies[target].resistStr.includes('pD') == true)  {//check for drain phys
