@@ -38,6 +38,8 @@ function battlePlayerTurn(turn, enemies) { //function that runs when it is a par
 
     window.addEventListener('keydown', commandBox); // allow keyboard and mouse countrols for command box
     document.querySelector('#commandRow0').addEventListener('click', playerFightTarget);
+    document.querySelector('#commandRow1').addEventListener('click', useItem);
+    document.querySelector('#commandRow2').addEventListener('click', useSkill);
 } //end battleplayerturn
 
 function drawArrow() { // function to draw the arrow
@@ -84,11 +86,65 @@ let commandBox = function(e){
 
 }; // end commandbox
 
+function partySelectTarget(skill) { //function for selecting a party target
+  $('.description-box').html(`
+    <p class="text-center dos">Please select a target</p>
+    <div class="flex-container justify-space-around game" id="partySelectRow"></div>
+    `);
+  for(let i=0; i<party.length; i++) {
+    $('#partySelectRow').append(`
+      <button class="btn btn-success" id="partymember${i}">${party[i].name}</button>
+      `)
+    document.querySelector('#partymember' + i).addEventListener('click', function() {
+      $('.description-box').html(``);
+      partySkillUse(skill, i);
+    });
+  } //end for
+  //console.log('test');
+  $('#partySelectRow').append(`<button id="target-cancel" class="button btn-warning">Cancel</button>`);
+  document.querySelector('#target-cancel').addEventListener('click', function() {
+    $('.description-box').html(``);
+    window.addEventListener('keydown', commandBox); //re-add mouse and keyboard listeneres for command box
+    document.querySelector('#commandRow0').addEventListener('click', playerFightTarget);
+    document.querySelector('#commandRow1').addEventListener('click', useItem);
+    document.querySelector('#commandRow2').addEventListener('click', useSkill);
+
+  });
+}//end partySelectTarget
+
+//heal skill formula healpow + (level * mag)
+
+function partySkillUse(skill, target) {
+  //console.log(skill, target);
+  switch(skill) {
+    case 'dia':
+      if(party[currentTurn].currentMP < abilityList[skill].mpCost) {
+        $('.description-box').html(`<p class="game">You don't have enough MP for this skill!</p>`);
+        break;
+      } else {
+        cancelItem(); // hide skill box
+        $(inventoryBox).html(``); //and empty it
+        party[currentTurn].currentMP -= abilityList[skill].mpCost;
+        let healResult = abilityList[skill].healPow;
+        healResult = healResult + (party[currentTurn].mag * party[currentTurn].level);
+        $('.description-box').html(`${party[currentTurn].name} used ${skill}...`);
+        setTimeout(function() {
+          party[target].currentHP += healResult;
+          if(party[target].currentHP > party[target].maxHP) {party[target].currentHP = party[target].maxHP;}
+          $('.description-box').html(`<p class="game">${party[target].name} is healed for ${healResult} HP.`);
+          drawPartyHealth();
+        }, 3000);
+        nextTurn();
+        break;
+      } //end mp check
+  }//end switch
+}//end partySkillUse
+
 //TYPES OF ATTACKS TO PASS TO TARGET
 // 'wpnatk' -- basic fight command
 // 'elem1x' -- level 1 elemental item with x being the element type
-
-function playerFightTarget(type) { // function to select a target
+// physskill magskill -- skills of a physical or magic variety
+function playerFightTarget(type, skill) { // function to select a target
   console.log(type);
   if(this.id=='commandRow0') {type = 'wpnatk';} // since values cant pe passed in event listeners without activating it, use 'this' to determine which row was selected therefore the attack type
   window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
@@ -109,7 +165,7 @@ function playerFightTarget(type) { // function to select a target
       document.querySelector('.attack-target-content' + i).addEventListener('click', function() {
         //console.log(`enemy ${i} selected`);
         $('.description-box').html(``);
-        attackEnemy(i, type);
+        attackEnemy(i, type, skill);
       });//end event listener
   } //end for
   $('#attack-target-container').append(`
@@ -125,7 +181,7 @@ function playerFightTarget(type) { // function to select a target
     }); //end cancel event listener
 } // end playerFightDamage
 
-function attackEnemy(target, type) { //an action has been selected, and now a target has been selected
+function attackEnemy(target, type, skill) { //an action has been selected, and now a target has been selected
   console.log(`attack ${type}triggered on ${target}`);
   let damage = 0;
   switch(type) {
@@ -196,6 +252,90 @@ function attackEnemy(target, type) { //an action has been selected, and now a ta
       }, 1000); //1s delay on damage draw.
       break;
 
+    case 'physskill': //start with a check if they have enough HP to use the skill
+      if(party[currentTurn].currentHP < party[currentTurn].maxHP*abilityList[skill].hpCost) {
+        $('.description-box').html(`You don't have enough HP to use this skill.`);
+      } else {
+        cancelItem();
+        $(inventoryBox).html(``);
+        $('.description-box').html(`${party[currentTurn].name} uses ${skill}...`);
+        party[currentTurn].currentHP -= Math.round(party[currentTurn].maxHP * abilityList[skill].hpCost);
+        drawPartyHealth();
+        let resistMod = 0;
+        // determine damage, get variables first to make this easier to analyze later
+        let level = party[currentTurn].level; // get actors level
+        let str = party[currentTurn].str; //get actors strength star
+        let wpnPow = party[currentTurn].weaponPwr; // get power of equipped weaponPwr
+        let damageMod = (Math.random() * 0.1) + 0.95; // random damage modifier, can be anwhere from 95% to 105%
+        let skillPow = abilityList[skill].atkPow;
+        if(currentEnemies[target].resistStr.includes('pS') == true) { //check for physical resistence strength
+          resistMod = 0.5; //50% damage reduction if strong against
+        } else if (currentEnemies[target].resistStr.includes('pW') == true) { //check for weakness
+          resistMod = 1.5; //50% damage boost
+        } else if (currentEnemies[target].resistStr.includes('pN') == true)  {// check for null resist
+          resistMod = 0; //100% damage resist
+        } else if (currentEnemies[target].resistStr.includes('pD') == true)  {//check for drain phys
+          resistMod = -0.75; //75% damage drained
+        } else {
+          resistMod = 1; //no change
+        }
+        let critCheck = Math.random();
+        let critMod = critCheck > 0.9 ? 1.5 : 1.0;
+        //DAMAGE FORUMLA
+        damage = 5 * Math.sqrt(level * (str + wpnPow) ) * damageMod * skillPow * resistMod * critMod;
+        damage = Math.round(damage);
+
+        //apply damage, use a time out for effect
+        setTimeout(function() {
+          currentEnemies[target].currentHP -= damage;
+          drawEnemies(); //redraw enemies
+          $('#battle-damage-text' + target).html(`
+            <p class="game">${party[currentTurn].name} just did ${damage} damage!</p>
+            `);
+          nextTurn(); // next persons turn
+        }, 1000); //1s delay on damage draw.
+      }//end hp check
+      break;
+
+    case 'magskill':
+      if(party[currentTurn].currentMP < abilityList[skill].mpCost) {
+        $('description-box').html(`<p class="game">You don't have enough MP for this skill</p>`);
+        break;
+      } else {
+        $('.description-box').html(`${party[currentTurn].name} used ${skill}!!`);
+        cancelItem();
+        let damage = 0;
+        let resistMod = 0;
+        let damageMod = (Math.random() * 0.1) + 0.95; // random damage modifier, can be anwhere from 95% to 105%
+        if(currentEnemies[target].resistStr.includes(`${abilityList[skill].element}S`) == true) { //check for physical resistence strength
+          resistMod = 0.5; //50% damage reduction if strong against
+        } else if (currentEnemies[target].resistStr.includes(`${abilityList[skill].element}W`) == true) { //check for weakness
+          resistMod = 1.5; //50% damage boost
+        } else if (currentEnemies[target].resistStr.includes(`${abilityList[skill].element}N`) == true)  {// check for null resist
+          resistMod = 0; //100% damage resist
+        } else if (currentEnemies[target].resistStr.includes(`${abilityList[skill].element}D`) == true)  {//check for drain phys
+          resistMod = -0.75; //75% damage drained
+        } else {
+          resistMod = 1; //no change
+        }
+        //damage = atkpow + (level * mag)
+        damage = abilityList[skill].atkPow + (party[currentTurn].level * party[currentTurn].mag);
+        // then * damage modifier and resistence. mag skills cannot crit
+        damage = Math.round(damage * resistMod * damageMod);
+
+        //apply damage, use a time out for effect
+        setTimeout(function() {
+          currentEnemies[target].currentHP -= damage;
+          drawEnemies(); //redraw enemies
+          $('#battle-damage-text' + target).html(`
+            <p class="game">${party[currentTurn].name} just did ${damage} damage!</p>
+            `);
+          nextTurn(); // next persons turn
+        }, 1000); //1s delay on damage draw.
+        break;
+      }
+
+
   } //end switch
 } //end attack enemy
 
@@ -209,18 +349,19 @@ function drawPartyHealth() { //function for drawing the party health in battle
           <div class="row">
             <div class="col-sm-4 col-sm-offset-4 party-member-box game text-center">
               <p>${party[0].name}</p>
-              <p id="hp0-text">HP: ${party[0].currentHP}/${party[0].currentHP}</p>
-              <p id="mp0-text">MP: ${party[0].currentMP}/${party[0].currentMP}</p>
+              <p id="hp0-text">HP: ${party[0].currentHP}/${party[0].maxHP}</p>
+              <p id="mp0-text">MP: ${party[0].currentMP}/${party[0].maxMP}</p>
             </div>
           </div>
         </div>
       `); //end append
       // Note: The reason the flag isnt switched here is because on the first battle draw, the party members draw will always be followed by the enemy and action bar draw. Therefore, resettig the initial draw flag is done on the last function
     } else { //otherwise just reset the content inside
+      console.log('redraw triggered');
       $('.party-member-box').html(`
         <p>${party[0].name}</p>
-        <p id="hp0-text">HP: ${party[0].currentHP}/${party[0].currentHP}</p>
-        <p id="mp0-text">MP: ${party[0].currentMP}/${party[0].currentMP}</p>
+        <p id="hp0-text">HP: ${party[0].currentHP}/${party[0].maxHP}</p>
+        <p id="mp0-text">MP: ${party[0].currentMP}/${party[0].maxMP}</p>
       `); //end .html
     } // end else
     if(party[0].currentHP / party[0].maxHP > 0.90) {
@@ -352,22 +493,50 @@ function selectItem(event) { //after a user clicks on an item, the appropriate a
 } //end selectItem
 
 function useSkill() { //player selected skill on the command menu. we will use the inventory box for this.
-  $(inventoryBox).html(`Click on an item to select it`); // clear inventory box and add header
-  let inventoryBoxId = 0;
+  $(inventoryBox).html(`<p class="text-warning">Click on an item to select it</p>`); // clear inventory box and add header
+  let skillBoxId = 0;
   inventoryBox.classList.remove('hide-inventory');
   window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
   $(inventoryBox).append(`
-    <div class="container" id="skillList">
+    <div class="container-fluid" id="skillList">
       <div class="row">
-        <div class="col-sm-2 text-center game">Elem</div>
-        <div class="col-sm-3 text-center game">Name</div>
-        <div class="col-sm-2 text-center game">Cost</div>
-        <div class="col-sm-5 text-center game">Description</div>
+        <div class="col-sm-2 text-center text-info game">Elem</div>
+        <div class="col-sm-3 text-center text-info game">Name</div>
+        <div class="col-sm-2 text-center text-info game">Cost</div>
+        <div class="col-sm-5 text-center text-info game">Description</div>
       </div>
     </div>
     `);
   for(let ability in party[currentTurn].abilityList) {
-    console.log(ability);
-  }
+    //console.log(ability);
+    $('#skillList').append(`
+      <div id="skillBox${skillBoxId}" class="row" title="${ability}">
+        <div class="col-sm-2 text-center skill-list game">${elementIcon(party[currentTurn].abilityList[ability].element)}</div>
+        <div class="col-sm-3 text-center skill-list game">${party[currentTurn].abilityList[ability].name}</div>
+        <div class="col-sm-2 text-center skill-list game">${displayCost(party[currentTurn].abilityList[ability])}</div>
+        <div class="col-sm-5 text-center skill-list dos">${party[currentTurn].abilityList[ability].description}</div>
+      </div>
+      `);
+      document.querySelector('#skillBox' + skillBoxId).addEventListener('click', selectSkill);
+      skillBoxId++;
+  } //end for
+  $(inventoryBox).append(`<button id="btnHideInv" class="btn btn-warning flex-container justify-center dos skill-cancel-button">Cancel</button>`);
+  document.querySelector('#btnHideInv').addEventListener('click', cancelItem);
 
 }
+
+function selectSkill(event) {
+  console.log(event.target.parentElement.title);
+  for(let skill in abilityList) {
+    if(event.target.parentElement.title == skill) {
+      console.log(`we have a match with ${skill}`);
+      if(abilityList[skill].attackType == 2) {
+        partySelectTarget(skill);
+      } else if(abilityList[skill].attackType == 1) {
+        playerFightTarget('magskill', skill);
+      } else if(abilityList[skill].attackType == 0) {
+        playerFightTarget('physskill', skill);
+      } // end if else
+    } //end matching skill if
+  } //end for..in
+} //end function selectSkill

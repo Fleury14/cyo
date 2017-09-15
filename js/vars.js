@@ -125,16 +125,17 @@ let abilityList = {
     name: 'Dia',
     description: 'Small healing to one target',
     mpCost: 4,
-    attacktype: 3,
+    element: 'heal',
+    attackType: 2,
     healPow: 30
   },
   strongStrike : {
     name: 'Strong Strike',
     description: 'Low physical damage to one enemy',
-    hpCost: 0.03,
-    attacktype: 0,
+    hpCost: 0.06,
+    attackType: 0,
     element: 'p',
-    atkPow: 30
+    atkPow: 1.1
   }
 }; //end ability list
 
@@ -154,28 +155,28 @@ function elementIcon(element) { //function to return the fontawesome icon of wha
   let icon = '';
   switch(element) {
     case 'f': //fire
-      icon = '<i class="fa fa-fire" aria-hidden="true"></i>';
+      icon = '<i class="fa fa-fire fire-icon" aria-hidden="true"></i>';
       break;
     case 'i': //ice
-      icon = '<i class="fa fa-snowflake-o" aria-hidden="true"></i>';
+      icon = '<i class="fa fa-snowflake-o ice-icon" aria-hidden="true"></i>';
       break;
     case 'w': //wind
-      icon='<i class="fa fa-envira" aria-hidden="true"></i>';
+      icon='<i class="fa fa-envira wind-icon" aria-hidden="true"></i>';
       break;
     case 'l': //lightning
-      icon='<i class="fa fa-bolt" aria-hidden="true"></i>';
+      icon='<i class="fa fa-bolt lightning-icon" aria-hidden="true"></i>';
       break;
     case 'h': //holy
       icon='<i class="fa fa-sun-o" aria-hidden="true"></i>';
       break;
     case 'd': //dark
-      icon='<i class="fa fa-internet-explorer" aria-hidden="true"></i>';
+      icon='<i class="fa fa-internet-explorer darkness-icon" aria-hidden="true"></i>';
       break;
     case 'p': //physical
-      icon='<i class="fa fa-hand-rock-o" aria-hidden="true"></i>';
+      icon='<i class="fa fa-hand-rock-o physical-icon" aria-hidden="true"></i>';
       break;
     case 'heal': //healing
-      icon='<i class="fa fa-medkit" aria-hidden="true"></i>';
+      icon='<i class="fa fa-medkit heal-icon" aria-hidden="true"></i>';
       break;
     default:
       icon='<span>ICON ERROR</span>';
@@ -183,3 +184,14 @@ function elementIcon(element) { //function to return the fontawesome icon of wha
   }//end switch
   return icon;
 }//end elementIcon
+
+function displayCost(ability) { //function to display hp/mp cost in the menu
+  console.log(ability);
+  let result = '';
+  if(ability.element=='p') { //if the ability is physical, display HP cost
+    result = `${Math.round(party[currentTurn].maxHP * ability.hpCost)} HP`;
+  } else { //otherwise display mp cost
+    result  = `${ability.mpCost} MP`;
+  }
+  return result;
+}

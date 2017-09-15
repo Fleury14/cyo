@@ -197,11 +197,24 @@ body {
   top: 250px;
   left: 10%;
   transition: 0.25s all;
+  padding: 20px;
 }
 
 .hide-inventory {
   transform: translateX(115%);
   display: none;
+}
+
+#skillList { /* The skill list from the command menu, located in script.js */
+  width: 100%;
+}
+
+.skill-list {
+  border-top: 1px solid #444;
+}
+
+.skill-cancel-button {
+  margin-top: 20px;
 }
 
 /* End inventory */
@@ -306,3 +319,33 @@ body {
   border: 2px dotted dodgerblue;
   padding: 5px;
 }
+
+/* icon styles */
+
+.wind-icon {
+  color: #186d27;
+}
+
+.lightning-icon {
+  color: #fcf937;
+ }
+
+.fire-icon {
+  color: #f47d42;
+ }
+
+.ice-icon {
+  color: #013896;
+}
+
+.darkness-icon {
+  color: #555555;
+ }
+
+.physical-icon {
+  color: #a30000;
+ }
+
+ .heal-icon {
+  color: #76f400;
+ }
