@@ -32,6 +32,10 @@ body {
   justify-content: center;
 }
 
+.align-center {
+  align-items: center;
+}
+
 .game {
   font-family: 'Game';
 }
@@ -187,7 +191,7 @@ body {
 
 .inventory-box {
   width: 80%;
-
+  z-index: 3;
   background-color: #000;
   border: 2px solid yellow;
   color: #fff;
@@ -197,11 +201,24 @@ body {
   top: 250px;
   left: 10%;
   transition: 0.25s all;
+  padding: 20px;
 }
 
 .hide-inventory {
   transform: translateX(115%);
   display: none;
+}
+
+#skillList { /* The skill list from the command menu, located in script.js */
+  width: 100%;
+}
+
+.skill-list {
+  border-top: 1px solid #444;
+}
+
+.skill-cancel-button {
+  margin-top: 20px;
 }
 
 /* End inventory */
@@ -248,6 +265,29 @@ body {
   transition: 0.5s all;
   border: 1px solid #fff;
   background-color: #222;
+}
+
+.result-box {
+  width: 80%;
+  height: 90vh;
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  left: 10%;
+  transition: 0.5s all;
+  border: 1px solid #fff;
+  background-color: #222;
+}
+
+.result-top {
+  height: 70vh;
+  width: 100%;
+}
+
+.result-bottom {
+  height: 20vh;
+  width: 100%;
+
 }
 
 .hide-battle {
@@ -306,3 +346,43 @@ body {
   border: 2px dotted dodgerblue;
   padding: 5px;
 }
+
+.game-over-text {
+  color: #fff;
+}
+
+.battle-over-button {
+  height: 50px;
+  padding: 10px;
+  color: #000;
+}
+
+/* icon styles */
+
+.wind-icon {
+  color: #186d27;
+}
+
+.lightning-icon {
+  color: #fcf937;
+ }
+
+.fire-icon {
+  color: #f47d42;
+ }
+
+.ice-icon {
+  color: #013896;
+}
+
+.darkness-icon {
+  color: #555555;
+ }
+
+.physical-icon {
+  color: #a30000;
+ }
+
+ .heal-icon {
+  color: #76f400;
+ }
