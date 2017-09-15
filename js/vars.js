@@ -18,9 +18,21 @@ function partyMember(name, level, resist, str, mag, ag) { //constructor for part
   this.armorPwr = 0;
   this.resistStr = '';
   this.abilityList = {};
-  this.exp = 0;
+  this.exp = xpChart[level];
+  this.usedGuard = false;
 
 } //end partyMember constructor
+
+let xpChart = {
+  1: 0,
+  2: 50,
+  3: 150,
+  4: 350,
+  5: 600,
+  6: 1000,
+  7: 1500
+
+}
 
 let inventory = {
   weapons : {
@@ -33,7 +45,7 @@ let inventory = {
   armor : {
     plainClothes: {
       name: 'Plain Clothes',
-      defensePow: 5,
+      armorPow: 5,
       numOwned: 0
     } //end plainclothes
   }, //end armor
@@ -139,7 +151,7 @@ let abilityList = {
   }
 }; //end ability list
 
-function enemy(name, hp, mp, resist, abilities, str, mag, ag) {
+function enemy(name, hp, mp, resist, abilities, str, mag, ag, ai, level, xp, money) {
   this.name = name;
   this.maxHP = hp;
   this.currentHP = hp;
@@ -147,9 +159,16 @@ function enemy(name, hp, mp, resist, abilities, str, mag, ag) {
   this.currentMP = mp;
   this.resistStr = resist;
   this.abilities = abilities;
+  this.str = str;
   this.mag = mag;
   this.ag = ag;
+  this.ai = ai;
+  this.level = level;
+  this.xp = xp;
+  this.money = money;
 } //end enemy constructor
+
+
 
 function elementIcon(element) { //function to return the fontawesome icon of whatever element is sent in
   let icon = '';

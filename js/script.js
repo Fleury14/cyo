@@ -43,18 +43,20 @@ let initialBattleDraw = true; //tells the function for drawing enemies if contai
 let battleOrder = [];
 let currentTurn = 0; //determines whose turn i t is in battle
 let battleTurn = 0; //determins which part of the battleorder array we are on
+let money = 0; //party $$
 
 //declare party members
 let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
-
-
-
-
-
-
 //declare enemies
-let enemyUkobach = new enemy('Ukobach', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2);
+let enemyUkobach = new enemy('Ukobach', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2, 50, 5);
+let enemyUkobach2 = new enemy('Ukobach 2', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2, 50, 5);
+
+
+
+
+
+
 
 
 battleBox.style.display = 'none';
@@ -616,14 +618,20 @@ function decision43() { // encounter mitsuru, end game
     musicControl.classList.add('invisible');
   }// end if
 
-  appendOutputConsole('p', 'You look over to the woman and you are hit with a wave of exhaustion. All these encounters have clearly tired you out, and you cant go much farther. You drop to a knee, and as you do, the woman puts her hands on your shoulders. You look up at her; she has long, brunette hair and appears to be wearing what would appear to be a black battle suit except that on top of it she is wearing an extravagant whit fur coat. There is a fencing sword holstered inside her coat. One look at her face and you can tell she is some kind of leader, as she is exuding confidence and strength. She looks down to you and simply says, "My name is Mitsuru Kirijo, and I\'m going to get you out of here"');
-  appendOutputConsole('p', 'TO BE CONTINUED...', 'text-center game');
+  appendOutputConsole('p', 'You look over to the woman and you are hit with a wave of exhaustion. All these encounters have clearly tired you out, and you cant go much farther. You drop to a knee, and as you do, the woman puts her hands on your shoulders. You look up at her; she has long, brunette hair and appears to be wearing what would appear to be a black battle suit except that on top of it she is wearing an extravagant whit fur coat. There is a fencing sword holstered inside her coat. One look at her face and you can tell she is some kind of leader, as she is exuding confidence and strength. However, all that strength seems to leave her at once, as her face turns pale and she loses consciousnes.');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="section200()">Continue</button>', 'flex-container justify-center');
 }
 
 function decision44() { //player ran out of items -- game over
 gameConsole.innerHTML = '';
 appendOutputConsole('p', 'You no longer have any items with which to fight the boss. As he approached you to attack, you are completely defenseless...');
 appendOutputConsole('p', '** GAME OVER ** ', 'game text-center');
+}
+
+function decision45() { //continuing transition to ch 2
+
+
+
 }
 
 // fucntion for outputting to conosle
@@ -764,7 +772,9 @@ function showBattleScreen() {
 
 function section200() { //begin chapter two
   clearScreen();
-  appendOutputConsole('p', 'Blah blah blah talk talk talk give this man a sword and lets fight..');
+  $('#ch2Skip').detach();
+  appendOutputConsole('p', 'A younger man comes out and runs to her aid. He introduces himself as Joseph. Before you can get an explanation, another shadow comes after you. At this point, you\'re no longer exhausted, simply angry that these encounter will not stop. As you steel your resolve, you feel a strage sensation, as if an explosion of energy originated from your heart. You pick up a stray sword left at the womans feet. You seem to recall skills and abilities that you have no business remembering. As you turn to face the shadow, any fatigue from previous encouters is gone. It\'s time to fight. ');
+  appendOutputConsole('p', 'Gained and Equipped -Iron Sword-', 'game text-center');
   appendOutputConsole('div', '<button class="btn btn-primary" id="continue200">Continue</button>', 'flex-container justify-center');
   protag.name = playerName; //set the playername in his object, and add him to the party
   if(protag.name == '') {protag.name = 'Protag';}
@@ -774,7 +784,7 @@ function section200() { //begin chapter two
   protag.currentWeapon = inventory.weapons[protag.weaponObj].name;
   protag.currentArmor = inventory.armor[protag.armorObj].name;
   protag.weaponPwr = inventory.weapons[protag.weaponObj].attackPow;
-  protag.armorPwr = inventory.weapons[protag.weaponObj].defensePow;
+  protag.armorPwr = inventory.armor[protag.armorObj].armorPow;
   //put remaining elemental items from chapter 1 in inventory
   inventory.battleItems.fireBottle.numOwned += elemInv[0][1];
   inventory.battleItems.freezeSpray.numOwned += elemInv[1][1];
@@ -801,6 +811,21 @@ function section201() { //initial battle test
 function section202() { //battle complete
   document.querySelector('#resultCont').classList.add('hide-battle');
   document.querySelector('#battleBox').classList.add('hide-battle');
+  document.querySelector('.result-bottom').removeEventListener('click', section202);
+  clearScreen();
+  appendOutputConsole('p', 'You see two more of the same type of shadow coming at you. After the previous fight, you are now bristing with confidence, feeling like you can take on 10 enemies at once. You look over to Joseph quickly and notice a shocked expression on his face. You can\'t help but to grin in anticipation of the next fight...');
+  appendOutputConsole('div', '<button class="btn btn-info flex-container justify-center" id="to203">Continue</button>');
+  document.querySelector('#to203').addEventListener('click', section203);
+}
 
+function section203() {//battle 2, 1 vs 2
+document.querySelector('.result-bottom').addEventListener('click', section204);
+document.querySelector('#resultCont').classList.add('hide-battle');
+document.querySelector('#battleBox').classList.add('hide-battle');
+beginBattleEngine([enemyUkobach,enemyUkobach2]);
+}
 
+function section204() { //battle 2 complete
+  clearScreen();
+  appendOutputConsole('p', 'Battle 2 Complete');
 }
