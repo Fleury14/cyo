@@ -50,6 +50,7 @@ let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
 //declare enemies
 let enemyUkobach = new enemy('Ukobach', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2, 50, 5);
+let enemyUkobach2 = new enemy('Ukobach 2', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2, 50, 5);
 
 
 
@@ -771,7 +772,7 @@ function showBattleScreen() {
 
 function section200() { //begin chapter two
   clearScreen();
-
+  $('#ch2Skip').detach();
   appendOutputConsole('p', 'A younger man comes out and runs to her aid. He introduces himself as Joseph. Before you can get an explanation, another shadow comes after you. At this point, you\'re no longer exhausted, simply angry that these encounter will not stop. As you steel your resolve, you feel a strage sensation, as if an explosion of energy originated from your heart. You pick up a stray sword left at the womans feet. You seem to recall skills and abilities that you have no business remembering. As you turn to face the shadow, any fatigue from previous encouters is gone. It\'s time to fight. ');
   appendOutputConsole('p', 'Gained and Equipped -Iron Sword-', 'game text-center');
   appendOutputConsole('div', '<button class="btn btn-primary" id="continue200">Continue</button>', 'flex-container justify-center');
@@ -810,6 +811,21 @@ function section201() { //initial battle test
 function section202() { //battle complete
   document.querySelector('#resultCont').classList.add('hide-battle');
   document.querySelector('#battleBox').classList.add('hide-battle');
+  document.querySelector('.result-bottom').removeEventListener('click', section202);
+  clearScreen();
   appendOutputConsole('p', 'You see two more of the same type of shadow coming at you. After the previous fight, you are now bristing with confidence, feeling like you can take on 10 enemies at once. You look over to Joseph quickly and notice a shocked expression on his face. You can\'t help but to grin in anticipation of the next fight...');
+  appendOutputConsole('div', '<button class="btn btn-info flex-container justify-center" id="to203">Continue</button>');
+  document.querySelector('#to203').addEventListener('click', section203);
+}
 
+function section203() {//battle 2, 1 vs 2
+document.querySelector('.result-bottom').addEventListener('click', section204);
+document.querySelector('#resultCont').classList.add('hide-battle');
+document.querySelector('#battleBox').classList.add('hide-battle');
+beginBattleEngine([enemyUkobach,enemyUkobach2]);
+}
+
+function section204() { //battle 2 complete
+  clearScreen();
+  appendOutputConsole('p', 'Battle 2 Complete');
 }

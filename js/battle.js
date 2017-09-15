@@ -410,7 +410,46 @@ function drawEnemies(enemies) {
     let red = 255 - green;
     document.querySelector('#enemy-health-text0').style.color = `rgb(${red}, ${green}, 0)`;
     document.querySelector('#enemy-health-text0').style.fontSize = '4em';
-  } //end if
+  }  else if(currentEnemies.length==2) {
+    if(currentEnemies[0].currentHP<0) {console.log('neg hp triggered');currentEnemies[0].currentHP=0;}
+    if(currentEnemies[1].currentHP<0) {currentEnemies[1].currentHP=0;}
+    if(initialBattleDraw==true) { //same as drawing party, check to see if this is the first draw
+
+      $('#battleBox').append(`
+        <div class="container-fluid"></div class="row"><div class="col-sm-6">
+            <div class="enemy-container enemy0 game flex-container text-uppercase align-center">
+              <p>${currentEnemies[0].name}</p>
+              <p id="enemy-health-text0">${Math.ceil(currentEnemies[0].currentHP/currentEnemies[0].maxHP * 100)}%</p>
+              <p id="battle-damage-text0"></p>
+            </div>
+          </div><div class="col-sm-6">
+            <div class="enemy-container enemy1 game flex-container text-uppercase align-center">
+              <p>${currentEnemies[1].name}</p>
+              <p id="enemy-health-text1">${Math.ceil(currentEnemies[1].currentHP/currentEnemies[1].maxHP * 100)}%</p>
+              <p id="battle-damage-text1"></p>
+            </div>
+          </div></div></div>
+      `); // (if so, add containers) end append
+    } else { //if not, just edit the innermost HTML
+      $('.enemy0').html(`
+        <p>${currentEnemies[0].name}</p>
+        <p id="enemy-health-text0">${Math.ceil(currentEnemies[0].currentHP/currentEnemies[0].maxHP * 100)}%</p>
+        <p id="battle-damage-text0"></p>
+      `);
+      $('.enemy1').html(`
+        <p>${currentEnemies[1].name}</p>
+        <p id="enemy-health-text1">${Math.ceil(currentEnemies[1].currentHP/currentEnemies[1].maxHP * 100)}%</p>
+        <p id="battle-damage-text1"></p>
+      `);
+    } //end initial draw check
+    //console.log(enemies);
+    for(let i=0; i<2; i++) {
+      let green = Math.ceil(currentEnemies[i].currentHP/currentEnemies[i].maxHP * 255);
+      let red = 255 - green;
+      document.querySelector('#enemy-health-text' + i).style.color = `rgb(${red}, ${green}, 0)`;
+      document.querySelector('#enemy-health-text' + i).style.fontSize = '4em';
+    } //end for
+  }//end if
 } //end function drawEnemies()
 
 function drawActionBars() {
@@ -578,7 +617,16 @@ function nextTurn() {
     if(i.currentHP>0) {victory=false;}
   }); //end forEach
   if(victory==true) {//battle complete
+    //reset battle params
     document.querySelector('#resultCont').classList.remove('hide-battle');
+    initialBattleDraw=true; //allow initial draw
+    $(battleBox).html(``); //clear the box
+    currentEnemies.forEach(function(e){
+      e.currentHP=e.maxHP;
+      e.currentMP=e.maxMP;
+      battleOrder = [];
+    });
+
     let totalXP = 0;
     let totalMunz = 0;
     currentEnemies.forEach(function(e) { //use forEach to total up xp and money from battle
@@ -632,10 +680,18 @@ function nextTurn() {
   battleTurn++; //increment battleTurn to get the next part of the order array
   if(battleTurn==battleOrder.length) {battleTurn=0;} //make sure to loop around once it reaches the End
   currentTurn = battleOrder[battleTurn]; //next man up
-  if(currentTurn < 0) {battleEnemyTurn(currentTurn);} else {
-    $('.description-box').html(``);
-    battlePlayerTurn(currentTurn);}
-
+  if(currentTurn < 0) {
+    if(currentEnemies[e2p(currentTurn)].currentHP > 0){ //make sure a party member with hp 0 doesnt get a turn
+      battleEnemyTurn(currentTurn);
+    } else {nextTurn();}
+  } else {
+    if(party[currentTurn].currentHP > 0) {
+      $('.description-box').html(``);
+      battlePlayerTurn(currentTurn);
+    } else {
+      nextTurn();
+    } // end enemy hp check
+  } //end enemy turn actions
 } //end nextTurn
 
 function battleEnemyTurn() { //start of enemy turn. call their ai after 2s
