@@ -801,7 +801,7 @@ function section200() { //begin chapter two
 
 function section201() { //initial battle test
   //declare monsters for fight
-  //willpowerBGM.play();
+  willpowerBGM.play();
   $('.result-bottom').html(`<button class="btn btn-info battle-over-button game">Continue</button>`);
   document.querySelector('.result-bottom').addEventListener('click', section202);
   beginBattleEngine([enemyUkobach]);
