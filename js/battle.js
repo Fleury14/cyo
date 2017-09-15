@@ -9,10 +9,9 @@ function beginBattleEngine(enemies) {
   drawEnemies(enemies); //draw the enemy section
   drawActionBars(); //draw the bottom bars
   getBattleOrder(enemies); // get the turn order based on agility
-  let battleTurn = 0;
   let battleComplete = false;
-
-  if(battleOrder[battleTurn] < 0) {battleEnemyturn(battleTurn);} else {battlePlayerTurn(battleOrder[battleTurn]);}
+  currentTurn = 0
+  if(battleOrder[currentTurn] < 0) {battleEnemyturn(currentTurn);} else {battlePlayerTurn(battleOrder[currentTurn]);}
 
 } //end begin battleengine
 
@@ -540,3 +539,38 @@ function selectSkill(event) {
     } //end matching skill if
   } //end for..in
 } //end function selectSkill
+
+function nextTurn() {
+  //check to see if the party is dead
+  let gameOver = true; //set the flag to true and then go over each party members hp
+  party.forEach(function(i) { //if just one of them has hp over 0, switch the flag
+    console.log(i.currentHP);
+    if(i.currentHP>0) {gameOver=false;}
+  });
+  if(gameOver==true) { //game over man
+    document.querySelector('#resultCont').classList.remove('hide-battle');
+    $('.result-top').append(`
+      <p class="game game-over-text">GAME OVER</p>
+      `);
+    document.querySelector('.game-over-text').style.fontSize = '72px'
+    $('.result-bottom').html(``);
+  } //end gameover
+  let victory = true; //now do the same with the enemy
+  currentEnemies.forEach(function(i) {
+    if(i.currentHP>0) {victory=false;}
+  }); //end forEach
+  if(victory==true) {//battle complete
+    document.querySelector('#resultCont').classList.remove('hide-battle');
+    $('.result-top').append(`
+      <p class="game game-over-text">VICTOR-Y!!</p>
+      `);
+      document.querySelector('.game-over-text').style.fontSize = '72px'
+
+  } // end victory check
+  //at this point, the battle will continue, next turn up
+  battleTurn++; //increment battleTurn to get the next part of the order array
+  if(battleTurn==battleOrder.length) {battleTurn=0;} //make sure to loop around once it reaches the End
+  currentTurn = battleOrder[battleTurn]; //next man up
+  if(currentTurn < 0) {battleEnemyturn(currentTurn);} else {battlePlayerTurn(currentTurn);}
+
+}

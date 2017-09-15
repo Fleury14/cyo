@@ -32,6 +32,10 @@ body {
   justify-content: center;
 }
 
+.align-center {
+  align-items: center;
+}
+
 .game {
   font-family: 'Game';
 }
@@ -263,6 +267,29 @@ body {
   background-color: #222;
 }
 
+.result-box {
+  width: 80%;
+  height: 90vh;
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  left: 10%;
+  transition: 0.5s all;
+  border: 1px solid #fff;
+  background-color: #222;
+}
+
+.result-top {
+  height: 70vh;
+  width: 100%;
+}
+
+.result-bottom {
+  height: 20vh;
+  width: 100%;
+
+}
+
 .hide-battle {
   left: -80%;
 }
@@ -318,6 +345,16 @@ body {
 .attack-target-box {
   border: 2px dotted dodgerblue;
   padding: 5px;
+}
+
+.game-over-text {
+  color: #fff;
+}
+
+.battle-over-button {
+  height: 50px;
+  padding: 10px;
+  color: #000;
 }
 
 /* icon styles */

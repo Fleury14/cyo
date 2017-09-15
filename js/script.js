@@ -42,6 +42,8 @@ let currentEnemies=[];
 let initialBattleDraw = true; //tells the function for drawing enemies if containers need to either be drawn initially, or reset in the battle box
 let battleOrder = [];
 let currentTurn = 0; //determines whose turn i t is in battle
+let battleTurn = 0; //determins which part of the battleorder array we are on
+
 //declare party members
 let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
@@ -789,9 +791,16 @@ function section200() { //begin chapter two
 
 function section201() { //initial battle test
   //declare monsters for fight
-  willpowerBGM.play();
-
-
+  //willpowerBGM.play();
+  $('.result-bottom').html(`<button class="btn btn-info battle-over-button game">Continue</button>`);
+  document.querySelector('.result-bottom').addEventListener('click', section202);
   beginBattleEngine([enemyUkobach]);
+
+}
+
+function section202() { //battle complete
+  document.querySelector('#resultCont').classList.add('hide-battle');
+  document.querySelector('#battleBox').classList.add('hide-battle');
+
 
 }
