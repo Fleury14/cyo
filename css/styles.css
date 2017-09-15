@@ -282,6 +282,8 @@ body {
 .result-top {
   height: 70vh;
   width: 100%;
+  flex-direction: column;
+  color: #fff;
 }
 
 .result-bottom {
@@ -331,13 +333,13 @@ body {
 }
 
 .action-row {
-  height: 50px;
+  height: calc(23vh/4);
   color: #fff;
 
 }
 
 .arrow-box {
-  height: 50px;
+  height: calc(23vh/4);
   width: 50px;
   float: left;
 }
