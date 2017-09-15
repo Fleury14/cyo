@@ -10,7 +10,7 @@ function beginBattleEngine(enemies) {
   drawActionBars(); //draw the bottom bars
   getBattleOrder(enemies); // get the turn order based on agility
   let battleComplete = false;
-  currentTurn = 0
+  currentTurn = 0;
   if(battleOrder[currentTurn] < 0) {battleEnemyturn(currentTurn);} else {battlePlayerTurn(battleOrder[currentTurn]);}
 
 } //end begin battleengine
@@ -93,7 +93,7 @@ function partySelectTarget(skill) { //function for selecting a party target
   for(let i=0; i<party.length; i++) {
     $('#partySelectRow').append(`
       <button class="btn btn-success" id="partymember${i}">${party[i].name}</button>
-      `)
+      `);
     document.querySelector('#partymember' + i).addEventListener('click', function() {
       $('.description-box').html(``);
       partySkillUse(skill, i);
@@ -373,6 +373,7 @@ function drawEnemies(enemies) {
   if(currentEnemies.length == 1) {
 
     if(initialBattleDraw==true) { //same as drawing party, check to see if this is the first draw
+      if(currentEnemies[0].currentHP<0) {currentEnemies[0].currentHP=0;}
       $('#battleBox').append(`
         <div class="enemy-container game flex-container text-uppercase align-center">
           <p>${currentEnemies[0].name}</p>
@@ -552,7 +553,7 @@ function nextTurn() {
     $('.result-top').append(`
       <p class="game game-over-text">GAME OVER</p>
       `);
-    document.querySelector('.game-over-text').style.fontSize = '72px'
+    document.querySelector('.game-over-text').style.fontSize = '72px';
     $('.result-bottom').html(``);
   } //end gameover
   let victory = true; //now do the same with the enemy
@@ -564,13 +565,87 @@ function nextTurn() {
     $('.result-top').append(`
       <p class="game game-over-text">VICTOR-Y!!</p>
       `);
-      document.querySelector('.game-over-text').style.fontSize = '72px'
+      document.querySelector('.game-over-text').style.fontSize = '72px';
 
   } // end victory check
   //at this point, the battle will continue, next turn up
   battleTurn++; //increment battleTurn to get the next part of the order array
   if(battleTurn==battleOrder.length) {battleTurn=0;} //make sure to loop around once it reaches the End
   currentTurn = battleOrder[battleTurn]; //next man up
-  if(currentTurn < 0) {battleEnemyturn(currentTurn);} else {battlePlayerTurn(currentTurn);}
+  if(currentTurn < 0) {battleEnemyTurn(currentTurn);} else {battlePlayerTurn(currentTurn);}
 
+} //end nextTurn
+
+function battleEnemyTurn() { //start of enemy turn. call their ai after 2s
+  //console.log(currentEnemies[e2p(currentTurn)]);
+  $('.description-box').html(`Enemy ${currentEnemies[e2p(currentTurn)].name} prepares to act...`);
+  setTimeout(function() {currentEnemies[e2p(currentTurn)].ai();}, 2000);
+}
+
+function enemyTurnResult(type, target, skill) {
+  console.log(type, target, skill);
+  switch(type) { //switch to act based on the resulting attack type
+    case 'wpnatk': // in the event they use a weapon attack
+      let resistMod = 0;
+      // determine damage, get variables first to make this easier to analyze later
+      let level = currentEnemies[e2p(currentTurn)].level; // get actors level
+      let str = currentEnemies[e2p(currentTurn)].str; //get actors strength star
+      let damageMod = (Math.random() * 0.1) + 0.95; // random damage modifier, can be anwhere from 95% to 105%
+      if(party[target].resistStr.includes('pS') == true) { //check for physical resistence strength
+        resistMod = 0.5; //50% damage reduction if strong against
+      } else if (party[target].resistStr.includes('pW') == true) { //check for weakness
+        resistMod = 1.5; //50% damage boost
+      } else if (party[target].resistStr.includes('pN') == true)  {// check for null resist
+        resistMod = 0; //100% damage resist
+      } else if (party[target].resistStr.includes('pD') == true)  {//check for drain phys
+        resistMod = -0.75; //75% damage drained
+      } else {
+        resistMod = 1; //no change
+      }
+      let critCheck = Math.random();
+      let critMod = critCheck > 0.9 ? 1.5 : 1.0;
+      //DAMAGE FORUMLA note: since enemies dont have an equipped weapon, i double the strength.
+      damage = 5 * Math.sqrt(level * (str *2) ) * damageMod * resistMod * critMod;
+      damage = Math.round(damage);
+
+      //apply damage, use a time out for effect
+      setTimeout(function() {
+        party[target].currentHP -= damage;
+        drawPartyHealth(); //redraw enemies
+        $('#battle-damage-text' + target).html(`
+          <p class="game">${currentEnemies[e2p(currentTurn)].name} just did ${damage} damage to ${party[target].name}!</p>
+          `);
+        if(critMod>1){$('battle-damage-text' + target).append(`<p>Critical Hit</p>`);}
+        nextTurn(); // next persons turn
+      }, 1000); //1s delay on damage draw.
+      break;
+  }
+}
+
+function e2p(order) { // this function converts the negative number used in battle order to a usable array value in currentEnemies
+  let result = (order * -1) - 1;
+  return result;
+}
+
+//AI LIST --- MOVE THIS TO A LATER FILE
+
+//begin monster AI
+
+//general ai script: actions will be determined by a random number
+//actions passed: wpnatk (basic attack)
+//physskill, <skillobj>
+//magskill, <skillobj>
+//targeting is also done in this function, IF its an enemy target
+
+function ukobachAI() {
+  let num = Math.random();
+  let result = '';
+  let skill;
+  let target = 0;
+  if(num<0.70) {result = 'wpnatk';} else {
+    result = 'magskill';
+    skill = abilityList.agi;
+  }
+  target = Math.floor(Math.random() * party.length);
+  enemyTurnResult(result, target, skill);
 }

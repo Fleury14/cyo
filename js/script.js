@@ -54,7 +54,7 @@ let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 
 
 //declare enemies
-let enemyUkobach = new enemy('Ukobach', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2);
+let enemyUkobach = new enemy('Ukobach', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2);
 
 
 battleBox.style.display = 'none';

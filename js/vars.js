@@ -139,7 +139,7 @@ let abilityList = {
   }
 }; //end ability list
 
-function enemy(name, hp, mp, resist, abilities, str, mag, ag) {
+function enemy(name, hp, mp, resist, abilities, str, mag, ag, ai, level) {
   this.name = name;
   this.maxHP = hp;
   this.currentHP = hp;
@@ -147,8 +147,11 @@ function enemy(name, hp, mp, resist, abilities, str, mag, ag) {
   this.currentMP = mp;
   this.resistStr = resist;
   this.abilities = abilities;
+  this.str = str;
   this.mag = mag;
   this.ag = ag;
+  this.ai = ai;
+  this.level = level;
 } //end enemy constructor
 
 function elementIcon(element) { //function to return the fontawesome icon of whatever element is sent in
