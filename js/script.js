@@ -47,11 +47,20 @@ let money = 0; //party $$
 
 //declare party members
 let protag = new partyMember('', 3, 'hS', 6, 6, 6);
+let joseph = new partyMember('Joseph', 4, 'fS', 4, 7, 4);
 
+joseph.abilityList.agi = abilityList.agi;
+joseph.abilityList.bufu = abilityList.bufu;
+joseph.weaponObj = 'ironSword';
+joseph.armorObj = 'plainClothes';
+joseph.currentWeapon = inventory.weapons[joseph.weaponObj].name;
+joseph.currentArmor = inventory.armor[joseph.armorObj].name;
+joseph.weaponPwr = inventory.weapons[joseph.weaponObj].attackPow;
+joseph.armorPwr = inventory.armor[joseph.armorObj].armorPow;
 //declare enemies
 let enemyUkobach = new enemy('Ukobach', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2, 50, 5);
 let enemyUkobach2 = new enemy('Ukobach 2', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2, 50, 5);
-
+let enemyBerith = new enemy('Berith', 150, 30, 'wSfW', [abilityList.strongStrike, abilityList.garu], 4, 4, 3, berithAI, 4, 120, 8 );
 
 
 
@@ -762,6 +771,7 @@ function muteMusic() { // functionality for the mute button
 
 function clearScreen() { //function to clear screens
   gameConsole.innerHTML = '';
+  $('.result-top').html(``);
 }
 
 function showBattleScreen() {
@@ -826,6 +836,21 @@ beginBattleEngine([enemyUkobach,enemyUkobach2]);
 }
 
 function section204() { //battle 2 complete
+  document.querySelector('#resultCont').classList.add('hide-battle');
+  document.querySelector('#battleBox').classList.add('hide-battle');
+  document.querySelector('.result-bottom').removeEventListener('click', section204);
   clearScreen();
-  appendOutputConsole('p', 'Battle 2 Complete');
+  appendOutputConsole('p', 'After defeating the previous two shadows, you see two more accompanied by the same bigger shadow you encountered before. This time, however, it does not have a shield that is rotating in color. Still on a high from the last battle, you prepare to take on all three when Joseph, sword in hand, walks beside you. He mentions something about your abilities, but you can hardly hear him in anticipation of the next fight. Regardless, it looks like he\'s here to help');
+  appendOutputConsole('div', '<button class="btn btn-info flex-container justify-center" id="to205">Continue</button>');
+  document.querySelector('#to205').addEventListener('click', section205);
+}
+
+function section205() { //battle 3, 2v3
+  document.querySelector('.result-bottom').addEventListener('click', section206);
+  party.push(joseph);
+  beginBattleEngine([enemyUkobach, enemyBerith, enemyUkobach2]);
+
+}
+
+function section206() {//battle complete
 }
