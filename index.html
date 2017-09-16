@@ -24,7 +24,8 @@
     </div> <!-- end lifebar row -->
     <div class="row"> <!-- begin middle row -->
       <div class="col-sm-1" id="left-button-area"> <!-- begin left button area -->
-        <button class="btn btn-block btn-warning dos invisible" id="inventoryButton" onclick="showInventory()">INV</button>
+        <button class="btn btn-block btn-warning dos invisible" id="inventoryButton">INV</button>
+        <button class="btn btn-block btn-danger dos invisible" id="status-button">STATUS</button>
       </div> <!-- end left button area -->
       <div class="col-sm-10 game-console" id="gameConsole"> <!-- begin main game console -->
         <p id="intro-text">Welcome to a small adventure game. This is a class project in javascript. I hope you have as much fun playing this as I did making it. Please click the Start button to continue.</p>
@@ -41,6 +42,17 @@
   <div id="dialogue-box" class="flex-container game hide-dialogue"></div>
   <div id="blackBox" class="blacken-box"></div>
   <div id="inventoryBox" class="inventory-box flex-container game hide-inventory"></div>
+  <div id="status-box" class="show-status flex-container game hide-status">
+    <div class="container" class="game">
+      <div class="row text-center" id="status-name"></div>
+      <div class="row text-center" id="status-level"></div>
+      <div class="row">
+        <div class="col-sm-6 flex-container" id="status-left-box"></div>
+        <div class="col-sm-6 flex-container text-center" id="status-right-box"></div>
+      </div>
+      <div class="row flex-container justify-space-around" id="status-button-row"></div>
+    </div>
+  </div>
   <div id="jokerBox" class="joker-box hide-joker">
     <img src="img/p5joker.png" alt="" class="jokerpic img-responsive">
   </div>

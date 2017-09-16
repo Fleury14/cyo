@@ -19,6 +19,8 @@ const battleBox = document.querySelector('#battleBox');
 const leftButtonArea = document.getElementById('left-button-area');
 const bossBGM = new Audio('sound/villain.mp3');
 const willpowerBGM = new Audio('sound/willpower.mp3');
+const statusButton = document.querySelector('#status-button');
+const statusBox = document.querySelector('#status-box');
 let musicControl = ''; // will be used for audio button once drawn
 
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
@@ -49,6 +51,7 @@ let money = 0; //party $$
 let protag = new partyMember('', 3, 'hS', 6, 6, 6);
 let joseph = new partyMember('Joseph', 4, 'fS', 4, 7, 4);
 
+//initial equipment and abilities for joseph
 joseph.abilityList.agi = abilityList.agi;
 joseph.abilityList.bufu = abilityList.bufu;
 joseph.weaponObj = 'ironSword';
@@ -71,11 +74,17 @@ let enemyBerith = new enemy('Berith', 150, 30, 'wSfW', [abilityList.strongStrike
 battleBox.style.display = 'none';
 document.getElementById('intro-button').addEventListener('click', beginGame);
 document.getElementById('intro-button').addEventListener('touchstart', beginGame);
+inventoryButton.addEventListener('click', showInventory);
 document.querySelector('#ch2Skip').addEventListener('click', function() {
   inventory.battleItems.fireBottle.numOwned = 3;
   inventory.battleItems.freezeSpray.numOwned = 3;
   inventory.battleItems.airCannon.numOwned = 3;
   inventory.battleItems.stunGun.numOwned = 3;
+  inventoryButton.removeEventListener('click', showInventory);
+  inventoryButton.classList.remove('invisible');
+  inventoryButton.addEventListener('click', showNewInventory);
+  statusButton.classList.remove('invisible');
+  statusButton.addEventListener('click', showPartyStatus);
   section200();
 });
 
@@ -712,6 +721,28 @@ function showInventory() {
 
 }// end show inventory
 
+function showNewInventory() { //function to display new inventory object
+
+  if (!(inventoryBox.classList.contains('hide-inventory'))) {
+    inventoryBox.classList.add('hide-inventory');
+    inventoryBox.innerHTML = '';
+    return;
+  }
+
+  inventoryBox.classList.remove('hide-inventory');
+  for (let item in inventory.battleItems) { //go through all battle items
+    console.log(item.numOwned);
+    if(inventory.battleItems[item].numOwned>0){ //make sure they have said item
+      $(inventoryBox).append(`<p>${inventory.battleItems[item].name} : ${inventory.battleItems[item].numOwned}</p>`);
+    } //end if
+  } // end for..in
+
+  insertedElement = document.createElement('div');
+  insertedElement.innerHTML = '<button class="btn btn-warning flex-container justify-center dos" onclick="hideInventory()">Hide Inventory</button>';
+  inventoryBox.appendChild(insertedElement); // draw hide inv button
+
+}// end show inventory
+
 function hideInventory() {
   inventoryBox.classList.add('hide-inventory'); //shift box over
   let inventoryDelay = setTimeout(function() {inventoryBox.innerHTML = '';}, 250); // empty content
@@ -767,6 +798,7 @@ function muteMusic() { // functionality for the mute button
   } //end if
 } //end muteMusic
 
+
 // CHAPTER 2 !!!!!!
 
 function clearScreen() { //function to clear screens
@@ -779,6 +811,47 @@ function showBattleScreen() {
   battleBox.classList.remove('hide-battle');
 }
 
+function showPartyStatus() { //function to show the status screen
+  statusBox.classList.remove('hide-status');
+  let member = 0;
+  drawStatus(member);
+  document.querySelector('#hide-status-button').addEventListener('click', function() {
+    statusBox.classList.add('hide-status');
+  });
+}
+
+function drawStatus(member) { //function to fill in the status box with the respective values
+  $('#status-name').html(`
+    <h1 class="game">${party[member].name}</h1>
+    `);
+  $('#status-level').html(`
+    <h2 class="game">Level ${party[member].level}</h2>
+    <h4>XP: ${party[member].xp} / ${xpChart[party[member].level + 1]}</h4>
+    `);
+  $('#status-left-box').html(`
+    <h3>HP: ${party[member].currentHP} / ${party[member].maxHP}</h3>
+    <h3>HP: ${party[member].currentMP} / ${party[member].maxMP}</h3>
+    <h3>Strength: ${party[member].str}</h3>
+    <h3>Magic: ${party[member].mag}</h3>
+    <h3>Agility: ${party[member].ag}</h3>
+    `);
+  $('#status-right-box').html(`
+    <div>
+      <h3>Equipped weapon</h3>
+      <h3>${party[member].currentWeapon}</h3>
+      <h3>ATK: ${party[member].weaponPwr}</h3>
+    </div>
+    <div>
+      <h3>Equipped armor:</h3>
+      <h3>${party[member].currentArmor}</h3>
+      <h3>DEF: ${party[member].armorPwr}</h3>
+    </div>
+
+    `);
+  $('#status-button-row').html(`
+    <button id="hide-status-button" class="btn btn-info">Continue</button>
+    `);
+}
 
 function section200() { //begin chapter two
   clearScreen();
