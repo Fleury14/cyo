@@ -71,11 +71,15 @@ let enemyBerith = new enemy('Berith', 150, 30, 'wSfW', [abilityList.strongStrike
 battleBox.style.display = 'none';
 document.getElementById('intro-button').addEventListener('click', beginGame);
 document.getElementById('intro-button').addEventListener('touchstart', beginGame);
+inventoryButton.addEventListener('click', showInventory);
 document.querySelector('#ch2Skip').addEventListener('click', function() {
   inventory.battleItems.fireBottle.numOwned = 3;
   inventory.battleItems.freezeSpray.numOwned = 3;
   inventory.battleItems.airCannon.numOwned = 3;
   inventory.battleItems.stunGun.numOwned = 3;
+  inventoryButton.removeEventListener('click', showInventory);
+  inventoryButton.classList.remove('invisible');
+  inventoryButton.addEventListener('click', showNewInventory);
   section200();
 });
 
@@ -705,6 +709,28 @@ function showInventory() {
     insertedElement.textContent = item[0] + ': ' + item[1];
     inventoryBox.appendChild(insertedElement);
   }); // end foreach
+
+  insertedElement = document.createElement('div');
+  insertedElement.innerHTML = '<button class="btn btn-warning flex-container justify-center dos" onclick="hideInventory()">Hide Inventory</button>';
+  inventoryBox.appendChild(insertedElement); // draw hide inv button
+
+}// end show inventory
+
+function showNewInventory() { //function to display new inventory object
+
+  if (!(inventoryBox.classList.contains('hide-inventory'))) {
+    inventoryBox.classList.add('hide-inventory');
+    inventoryBox.innerHTML = '';
+    return;
+  }
+
+  inventoryBox.classList.remove('hide-inventory');
+  for (let item in inventory.battleItems) { //go through all battle items
+    console.log(item.numOwned);
+    if(inventory.battleItems[item].numOwned>0){ //make sure they have said item
+      $(inventoryBox).append(`<p>${inventory.battleItems[item].name} : ${inventory.battleItems[item].numOwned}</p>`);
+    } //end if
+  } // end for..in
 
   insertedElement = document.createElement('div');
   insertedElement.innerHTML = '<button class="btn btn-warning flex-container justify-center dos" onclick="hideInventory()">Hide Inventory</button>';
