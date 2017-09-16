@@ -746,12 +746,12 @@ function nextTurn() {
 
         $('.result-top').append(`
           <h2 class="game game-over-text">${e.name} has reached level ${e.level + 1}!</h2>
-          <h3>HP: +${HPBonus}</h3>
-          <h3>MP: +${MPBonus}</h3>
+          <h3 class="game">HP: +${HPBonus}, max is now ${e.maxHP}</h3>
+          <h3 class="game">MP: +${MPBonus}, max is now ${e.maxMP}</h3>
           `);
-        if(strBonus>0) {$('.result-top').append(`Str: +${strBonus}`);}
-        if(magBonus>0) {$('.result-top').append(`Str: +${magBonus}`);}
-        if(agBonus>0) {$('.result-top').append(`Str: +${agBonus}`);}
+        if(strBonus>0) {$('.result-top').append(`<h3 class="game">Str: +${strBonus}</h3>`);}
+        if(magBonus>0) {$('.result-top').append(`<h3 class="game">Mag: +${magBonus}</h3>`);}
+        if(agBonus>0) {$('.result-top').append(`<h3 class="game">Ag: +${agBonus}</h3>`);}
         e.xp+=totalXP;
         e.level++;
         e.str+=strBonus;

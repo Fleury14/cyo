@@ -18,7 +18,7 @@ function partyMember(name, level, resist, str, mag, ag) { //constructor for part
   this.armorPwr = 0;
   this.resistStr = '';
   this.abilityList = {};
-  this.exp = xpChart[level];
+  this.xp = xpChart[level];
   this.usedGuard = false;
 
 } //end partyMember constructor
