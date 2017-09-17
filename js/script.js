@@ -744,6 +744,7 @@ function showNewInventory() { //function to display new inventory object
 }// end show inventory
 
 function hideInventory() {
+  gameSound.sfx.cursorCancel.play();
   inventoryBox.classList.add('hide-inventory'); //shift box over
   let inventoryDelay = setTimeout(function() {inventoryBox.innerHTML = '';}, 250); // empty content
 }

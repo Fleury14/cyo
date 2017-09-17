@@ -51,7 +51,13 @@ let gameSound = {
     willPower : new Audio('sound/willpower.mp3')
   },
   sfx : {
-    crit : new Audio('sound/persona5-crit.wav')
+    crit : new Audio('sound/persona5-crit.wav'),
+    hit1 : new Audio('sound/hit1.wav'),
+    beep : new Audio('sound/iconbeep.wav'),
+    doubleBeep : new Audio('sound/doublebeep.wav'),
+    cursorBeep : new Audio('sound/finger.wav'),
+    cursorCancel : new Audio('sound/cancel.mp3')
+
   }
 };
 

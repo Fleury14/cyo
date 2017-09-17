@@ -73,19 +73,22 @@ let currentArrow = 0; //defaults to the top item on start (had to scope it outsi
 let commandBox = function(e){
     console.log(e); // listens for key presses
   if(e.key == 'ArrowDown') { //if they push the down arrow....
+    gameSound.sfx.cursorBeep.play();
     currentArrow++; //increase the target by one
     if(currentArrow==4) {currentArrow=0;} //this if makes sure it wraps around after you hit the bottom
     drawArrow(); //and redraw the arrow
   }
   if(e.key == 'ArrowUp') { // same thing, but going up this time
     currentArrow--;
+    gameSound.sfx.cursorBeep.play();
     if(currentArrow==-1) {currentArrow=3;}
     drawArrow();
   }
   if(e.key == 'Enter') { //if they press enter...
+    gameSound.sfx.beep.play();
     switch(currentArrow) { //check and see what the arrow is currently set to and execute the appropriate alert
       case 0:
-        let target = playerFightTarget('wpnatk');
+        playerFightTarget('wpnatk');
         break;
       case 1:
         useItem();
@@ -162,7 +165,7 @@ function partySkillUse(skill, target) {
 // 'elem1x' -- level 1 elemental item with x being the element type
 // physskill magskill -- skills of a physical or magic variety
 function playerFightTarget(type, skill) { // function to select a target
-  console.log(type);
+  //console.log(type);
   if(this.id=='commandRow0') {type = 'wpnatk';} // since values cant pe passed in event listeners without activating it, use 'this' to determine which row was selected therefore the attack type
   window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
   $('.description-box').html(`
@@ -172,7 +175,7 @@ function playerFightTarget(type, skill) { // function to select a target
     `); //end html
 
   for(let i=0; i<currentEnemies.length; i++) {
-    //console.log('appending...');
+    console.log('appending targets...');
     $('#attack-target-container').append(`
       <div class="attack-target-box">
         <div class="attack-target-arrow"></div>
@@ -181,6 +184,7 @@ function playerFightTarget(type, skill) { // function to select a target
       `);
       document.querySelector('.attack-target-content' + i).addEventListener('click', function() {
         //console.log(`enemy ${i} selected`);
+        gameSound.sfx.cursorBeep.play();
         $('.description-box').html(``);
         attackEnemy(i, type, skill);
       });//end event listener
@@ -192,6 +196,7 @@ function playerFightTarget(type, skill) { // function to select a target
     </div>
     `);
     document.querySelector('.attack-target-cancel').addEventListener('click', function() { //in the event they cancel the target selection
+      gameSound.sfx.doubleBeep.play();
       $('.description-box').html(``); // clear the description-box
       window.addEventListener('keydown', commandBox); //re-add mouse and keyboard listeneres for command box
       document.querySelector('#commandRow0').addEventListener('click', playerFightTarget);
@@ -235,6 +240,7 @@ function attackEnemy(target, type, skill) { //an action has been selected, and n
       setTimeout(function() {
         currentEnemies[target].currentHP -= damage;
         drawEnemies(); //redraw enemies
+        gameSound.sfx.hit1.play();
         $('#battle-damage-text' + target).html(`
           <p class="game">${party[currentTurn].name} just did ${damage} damage!</p>
           `);
@@ -617,6 +623,7 @@ function useItem() { //function when player selects item from the command list
 
 function cancelItem() {
   inventoryBox.classList.add('hide-inventory'); //shift box over
+  gameSound.sfx.doubleBeep.play();
   let inventoryDelay = setTimeout(function() {inventoryBox.innerHTML = '';}, 250); // empty content
   window.addEventListener('keydown', commandBox); // allow keyboard and mouse countrols for command box
 
@@ -848,6 +855,7 @@ function enemyTurnResult(type, target, skill) {
       setTimeout(function() {
         party[target].currentHP -= damage;
         drawPartyHealth(); //redraw enemies
+        gameSound.sfx.hit1.play();
         $('#battle-damage-text' + e2p(currentTurn)).html(`
           <p class="game">${currentEnemies[e2p(currentTurn)].name} just did ${damage} damage to ${party[target].name}!</p>
           `);
