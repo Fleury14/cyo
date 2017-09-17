@@ -11,8 +11,12 @@ function beginBattleEngine(enemies) {
   getBattleOrder(enemies); // get the turn order based on agility
   let battleComplete = false;
   currentTurn = 0;
-  if(battleOrder[currentTurn] < 0) {battleEnemyturn(currentTurn);}
+  if(battleOrder[currentTurn] < 0) {
+    $(`.enemy${e2p(currentTurn)}`).addClass('current-turn-border');
+    battleEnemyturn(currentTurn);
+  } //end enemy turn
   else {
+    $('.party' + currentTurn).addClass('current-turn-border');
     battlePlayerTurn(battleOrder[currentTurn]);
     $('.description-box').html(`It is ${party[currentTurn].name}'s turn, select an action.`);
   }
@@ -69,19 +73,22 @@ let currentArrow = 0; //defaults to the top item on start (had to scope it outsi
 let commandBox = function(e){
     console.log(e); // listens for key presses
   if(e.key == 'ArrowDown') { //if they push the down arrow....
+    gameSound.sfx.cursorBeep.play();
     currentArrow++; //increase the target by one
     if(currentArrow==4) {currentArrow=0;} //this if makes sure it wraps around after you hit the bottom
     drawArrow(); //and redraw the arrow
   }
   if(e.key == 'ArrowUp') { // same thing, but going up this time
     currentArrow--;
+    gameSound.sfx.cursorBeep.play();
     if(currentArrow==-1) {currentArrow=3;}
     drawArrow();
   }
   if(e.key == 'Enter') { //if they press enter...
+    gameSound.sfx.beep.play();
     switch(currentArrow) { //check and see what the arrow is currently set to and execute the appropriate alert
       case 0:
-        let target = playerFightTarget('wpnatk');
+        playerFightTarget('wpnatk');
         break;
       case 1:
         useItem();
@@ -158,7 +165,7 @@ function partySkillUse(skill, target) {
 // 'elem1x' -- level 1 elemental item with x being the element type
 // physskill magskill -- skills of a physical or magic variety
 function playerFightTarget(type, skill) { // function to select a target
-  console.log(type);
+  //console.log(type);
   if(this.id=='commandRow0') {type = 'wpnatk';} // since values cant pe passed in event listeners without activating it, use 'this' to determine which row was selected therefore the attack type
   window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
   $('.description-box').html(`
@@ -168,7 +175,7 @@ function playerFightTarget(type, skill) { // function to select a target
     `); //end html
 
   for(let i=0; i<currentEnemies.length; i++) {
-    //console.log('appending...');
+    console.log('appending targets...');
     $('#attack-target-container').append(`
       <div class="attack-target-box">
         <div class="attack-target-arrow"></div>
@@ -177,6 +184,7 @@ function playerFightTarget(type, skill) { // function to select a target
       `);
       document.querySelector('.attack-target-content' + i).addEventListener('click', function() {
         //console.log(`enemy ${i} selected`);
+        gameSound.sfx.cursorBeep.play();
         $('.description-box').html(``);
         attackEnemy(i, type, skill);
       });//end event listener
@@ -188,6 +196,7 @@ function playerFightTarget(type, skill) { // function to select a target
     </div>
     `);
     document.querySelector('.attack-target-cancel').addEventListener('click', function() { //in the event they cancel the target selection
+      gameSound.sfx.doubleBeep.play();
       $('.description-box').html(``); // clear the description-box
       window.addEventListener('keydown', commandBox); //re-add mouse and keyboard listeneres for command box
       document.querySelector('#commandRow0').addEventListener('click', playerFightTarget);
@@ -231,6 +240,7 @@ function attackEnemy(target, type, skill) { //an action has been selected, and n
       setTimeout(function() {
         currentEnemies[target].currentHP -= damage;
         drawEnemies(); //redraw enemies
+        gameSound.sfx.hit1.play();
         $('#battle-damage-text' + target).html(`
           <p class="game">${party[currentTurn].name} just did ${damage} damage!</p>
           `);
@@ -268,6 +278,8 @@ function attackEnemy(target, type, skill) { //an action has been selected, and n
           `);
         nextTurn(); // next persons turn
       }, 1000); //1s delay on damage draw.
+      setTimeout(function() {$('#battle-damage-text' + target).html(``);}, 2000); //2s delay on clear
+
       break;
 
     case 'physskill': //start with a check if they have enough HP to use the skill
@@ -367,7 +379,7 @@ function drawPartyHealth() { //function for drawing the party health in battle
       $('#battleBox').append(`
         <div class="container-fluid">
           <div class="row">
-            <div class="col-sm-4 col-sm-offset-4 party-member-box game text-center">
+            <div class="col-sm-4 col-sm-offset-4 party0 party-member-box game text-center">
               <p>${party[0].name}</p>
               <p id="hp0-text">HP: ${party[0].currentHP}/${party[0].maxHP}</p>
               <p id="mp0-text">MP: ${party[0].currentMP}/${party[0].maxMP}</p>
@@ -436,7 +448,7 @@ function drawEnemies(enemies) {
     if(initialBattleDraw==true) { //same as drawing party, check to see if this is the first draw
       if(currentEnemies[0].currentHP<0) {currentEnemies[0].currentHP=0;}
       $('#battleBox').append(`
-        <div class="enemy-container game flex-container text-uppercase align-center">
+        <div class="enemy-container game flex-container enemy0 text-uppercase align-center">
           <p>${currentEnemies[0].name}</p>
           <p id="enemy-health-text0">${Math.ceil(currentEnemies[0].currentHP/currentEnemies[0].maxHP * 100)}%</p>
           <p id="battle-damage-text0"></p>
@@ -567,7 +579,7 @@ function getBattleOrder(enemies) {
   let iteration = 0;
 
   while(iteration<(party.length + enemies.length)) {
-    console.log(`iteration total (party+enemies) = ${party.length + enemies.length}`)
+    console.log(`iteration total (party+enemies) = ${party.length + enemies.length}`);
     for(let i=0; i<party.length; i++) { //figure out party member with highest ag
       if(party[i].ag>currentMaxAg && battleOrder.includes(i)==false ) {
         currentMaxAg = party[i].ag;
@@ -611,6 +623,7 @@ function useItem() { //function when player selects item from the command list
 
 function cancelItem() {
   inventoryBox.classList.add('hide-inventory'); //shift box over
+  gameSound.sfx.doubleBeep.play();
   let inventoryDelay = setTimeout(function() {inventoryBox.innerHTML = '';}, 250); // empty content
   window.addEventListener('keydown', commandBox); // allow keyboard and mouse countrols for command box
 
@@ -746,8 +759,8 @@ function nextTurn() {
 
         $('.result-top').append(`
           <h2 class="game game-over-text">${e.name} has reached level ${e.level + 1}!</h2>
-          <h3 class="game">HP: +${HPBonus}, max is now ${e.maxHP}</h3>
-          <h3 class="game">MP: +${MPBonus}, max is now ${e.maxMP}</h3>
+          <h3 class="game">HP: +${HPBonus}, max is now ${e.maxHP + HPBonus}</h3>
+          <h3 class="game">MP: +${MPBonus}, max is now ${e.maxMP + MPBonus}</h3>
           `);
         if(strBonus>0) {$('.result-top').append(`<h3 class="game">Str: +${strBonus}</h3>`);}
         if(magBonus>0) {$('.result-top').append(`<h3 class="game">Mag: +${magBonus}</h3>`);}
@@ -759,6 +772,11 @@ function nextTurn() {
         e.ag+=agBonus;
         e.maxHP+=HPBonus;
         e.maxMP+=MPBonus;
+
+        if(e.skillGrowth[e.level] != undefined) {
+          $('.result-top').append(`<h2 class="game">${e.name} learned ${e.skillGrowth[e.level]}!!</h2>`);
+          e.abilityList[e.skillGrowth[e.level]]=abilityList[e.skillGrowth[e.level]];
+        }
       } else {
         e.xp+=totalXP;
       }
@@ -767,7 +785,13 @@ function nextTurn() {
       return;
   } // end victory check
 
-  //reset any damage notifications
+  //reset border on currentturn
+  if(currentTurn<0) {$('.enemy' + e2p(currentTurn)).removeClass('current-turn-border');}
+  else {
+    console.log(`'border removal on party end triggered, ideallty on party${currentTurn}'`);
+    $(`.party${currentTurn}`).removeClass('current-turn-border');
+  }
+
 
   //reset action-box so player can't make commands during an anemy turn
   $('.action-box').html(``);
@@ -777,10 +801,12 @@ function nextTurn() {
   currentTurn = battleOrder[battleTurn]; //next man up
   if(currentTurn < 0) {
     if(currentEnemies[e2p(currentTurn)].currentHP > 0){ //make sure a party member with hp 0 doesnt get a turn
+      $(`.enemy${e2p(currentTurn)}`).addClass('current-turn-border');
       battleEnemyTurn(currentTurn);
     } else {nextTurn();}
   } else {
     if(party[currentTurn].currentHP > 0) {
+      $(`.party${currentTurn}`).addClass('current-turn-border');
       $('.description-box').html(`It is ${party[currentTurn].name}'s turn, select an action.`);
       battlePlayerTurn(currentTurn);
     } else {
@@ -820,7 +846,7 @@ function enemyTurnResult(type, target, skill) {
       let critMod = critCheck > 0.9 ? 1.5 : 1.0;
       console.log(`level ${level}, str ${str}, $def ${def}, damageMod ${damageMod}, critMod ${critMod}`);
       //DAMAGE FORUMLA note: since enemies dont have an equipped weapon, i double the strength.
-      damage = 5 * Math.sqrt(level * (str * 3 - def) ) * damageMod * resistMod * critMod;
+      damage = 6 * Math.sqrt(level * (str * 3 - def) ) * damageMod * resistMod * critMod;
       if(party[target].usedGuard==true) {damage*=0.5;} //check to see if target is defending
       damage = Math.round(damage);
 
@@ -829,6 +855,7 @@ function enemyTurnResult(type, target, skill) {
       setTimeout(function() {
         party[target].currentHP -= damage;
         drawPartyHealth(); //redraw enemies
+        gameSound.sfx.hit1.play();
         $('#battle-damage-text' + e2p(currentTurn)).html(`
           <p class="game">${currentEnemies[e2p(currentTurn)].name} just did ${damage} damage to ${party[target].name}!</p>
           `);
@@ -845,13 +872,58 @@ function enemyTurnResult(type, target, skill) {
 
       break;
 
+    case 'physskill':
+      if(currentEnemies[e2p(currentTurn)].currentHP < skill.hpCost) { //if the enemy doesnt have enough mp, change type to wpnatk and rerun function
+          type = 'wpnatk';
+          enemyTurnResult(type, target, skill);
+          break;
+      } else {
+        $('.description-box').append(`<p>Enemy ${currentEnemies[e2p(currentTurn)].name} uses ${skill.name} on ${party[target].name}</p>`);
+        currentEnemies[e2p(currentTurn)].currentHP -= skill.hpCost;
+        let resistMod = 0;
+        let level = currentEnemies[e2p(currentTurn)].level; // get actors level
+        let str = currentEnemies[e2p(currentTurn)].str; // get actors mag
+        let skillPow = skill.atkPow;
+        let def = party[target].armorPwr; //get party members defense
+        let damageMod = (Math.random() * 0.1) + 0.95; // random damage modifier, can be anwhere from 95% to 105%
+        if(party[target].resistStr.includes(`${skill.element}S`) == true) { //check for physical resistence strength
+          resistMod = 0.5; //50% damage reduction if strong against
+        } else if (party[target].resistStr.includes(`${skill.element}W`) == true) { //check for weakness
+          resistMod = 1.5; //50% damage boost
+        } else if (party[target].resistStr.includes(`${skill.element}N`) == true)  {// check for null resist
+          resistMod = 0; //100% damage resist
+        } else if (party[target].resistStr.includes(`${skill.element}D`) == true)  {//check for drain phys
+          resistMod = -0.75; //75% damage drained
+        } else {
+          resistMod = 1; //no change
+        }
+        console.log(`level ${level}, mag ${mag}, skillpow ${skillPow}, def ${def}`);
+        damage = 6 * Math.sqrt(level * (str * 3 - def) ) * damageMod * resistMod * skillPow * critMod;
+
+        if(party[target].usedGuard==true) {damage*=0.5;} //check to see if target is defending
+        damage = Math.round(damage);
+        //apply damage, use a time out for effect
+        setTimeout(function() {
+          console.log(`${damage} damage`);
+          party[target].currentHP -= damage;
+          drawPartyHealth(); //redraw enemies
+          $('#battle-damage-text' + e2p(currentTurn)).html(`
+            <p class="game">${currentEnemies[e2p(currentTurn)].name} just did ${damage} damage to ${party[target].name}!</p>
+            `);
+          nextTurn(); // next persons turn
+        }, 1000); //1s delay on damage draw.
+        setTimeout(function() {$('#battle-damage-text' + e2p(currentTurn)).html(` `);}, 2000);
+        break;
+      }
+      break;
+
     case 'magskill':
       if(currentEnemies[e2p(currentTurn)].currentMP < skill.mpCost) { //if the enemy doesnt have enough mp, change type to wpnatk and rerun function
           type = 'wpnatk';
           enemyTurnResult(type, target, skill);
           break;
       } else {
-        $('.description-box').append(`<p>Enemy ${currentEnemies[e2p(currentTurn)].name} uses ${skill.name} on ${party[target].name}</p>`)
+        $('.description-box').append(`<p>Enemy ${currentEnemies[e2p(currentTurn)].name} uses ${skill.name} on ${party[target].name}</p>`);
         let resistMod = 0;
         let level = currentEnemies[e2p(currentTurn)].level; // get actors level
         let mag = currentEnemies[e2p(currentTurn)].mag; // get actors mag
@@ -881,9 +953,13 @@ function enemyTurnResult(type, target, skill) {
           $('#battle-damage-text' + e2p(currentTurn)).html(`
             <p class="game">${currentEnemies[e2p(currentTurn)].name} just did ${damage} damage to ${party[target].name}!</p>
             `);
-          nextTurn(); // next persons turn
+
         }, 1000); //1s delay on damage draw.
-        setTimeout(function() {$('#battle-damage-text' + e2p(currentTurn)).html(``);}, 2000);
+        setTimeout(function() {
+          $('#battle-damage-text' + e2p(currentTurn)).html(` `);
+          console.log('enemy magskill undraw triggered');
+          nextTurn(); // next persons turn
+        }, 2000);
         break;
       } //end mp check
 
@@ -944,7 +1020,7 @@ function berithAI() {
     //console.log(party[target].currentHP, target);
     if(party[target].currentHP>0) {
     //  console.log('true triggered');
-      breakLoop==true;
+      breakLoop=true;
       break;
     }
   }
