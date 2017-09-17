@@ -175,7 +175,7 @@ function decision11A() {
 
 function decision11B() {
   playerName = prompt('Please input your name:'); // Get players name
-  playerName == '' ? prompt('I don\'t know anyone without a name. If you are not willing to disclose yours, I cannot help you') : alert('Name recieved');
+  playerName = '' ? prompt('I don\'t know anyone without a name. If you are not willing to disclose yours, I cannot help you') : alert('Name recieved');
   drawHealthBar(); //redraw healthbar with name
   dialogueFlag = 0; // initiate conversation chain
   gameConsole.innerHTML = ''; //clear screen
@@ -504,7 +504,7 @@ function decision36() { // begin boss fight
   gameConsole.innerHTML='';
 
   if(enableMusic == true) {
-    bossBGM.play(); // play boss music
+    gameSound.bgm.villain.play(); // play boss music
     insertedElement = document.createElement('button');
     insertedElement.setAttribute('onclick', 'muteMusic()');
     insertedElement.setAttribute('id', 'musicControl');
@@ -750,7 +750,7 @@ function hideInventory() {
 
 function critAnimation() {
   let critSound = new Audio('sound/persona5-crit.wav');
-  critSound.play();
+  gameSound.sfx.crit.play();
   jokerBox.classList.remove('hide-joker');
   setTimeout(function() {jokerBox.classList.add('done-joker');}, 1000);
   setTimeout(function() {jokerBox.classList.add('no-transition');}, 1020);
@@ -790,10 +790,10 @@ function muteMusic() { // functionality for the mute button
   // This shows i can use ternary operators, but it gives a linter error
 
   if(enableMusic==true) {
-    bossBGM.pause();
+    gameSound.bgm.villain.pause();
     enableMusic = false;
   } else {
-    bossBGM.play();
+    gameSound.bgm.villain.play();
     enableMusic = true;
   } //end if
 } //end muteMusic
@@ -884,7 +884,7 @@ function section200() { //begin chapter two
 
 function section201() { //initial battle test
   //declare monsters for fight
-  willpowerBGM.play();
+  gameSound.bgm.willPower.play();
   $('.result-bottom').html(`<button class="btn btn-info battle-over-button game">Continue</button>`);
   document.querySelector('.result-bottom').addEventListener('click', section202);
   beginBattleEngine([enemyUkobach]);
@@ -926,4 +926,5 @@ function section205() { //battle 3, 2v3
 }
 
 function section206() {//battle complete
+  clearScreen();
 }

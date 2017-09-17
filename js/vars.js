@@ -34,7 +34,7 @@ let xpChart = {
   6: 1000,
   7: 1500
 
-}
+};
 
 let skillGrowthChart = {
   'protag' : {
@@ -45,6 +45,15 @@ let skillGrowthChart = {
   }//end joseph
 }; //end obj
 
+let gameSound = {
+  bgm : {
+    villain :  new Audio('sound/villain.mp3'),
+    willPower : new Audio('sound/willpower.mp3')
+  },
+  sfx : {
+    crit : new Audio('sound/persona5-crit.wav')
+  }
+};
 
 let inventory = {
   weapons : {
