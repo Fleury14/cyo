@@ -326,6 +326,8 @@ body {
   left: -80%;
 }
 
+
+
 .party-member-box {
   height: 25vh;
   color: #fff;
@@ -343,6 +345,10 @@ body {
 
 .enemy-container p {
   margin: 0;
+}
+
+.current-turn-border {
+  border: 4px dotted #ffff00;
 }
 
 .action-box, .description-box {
