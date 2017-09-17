@@ -48,8 +48,8 @@ let battleTurn = 0; //determins which part of the battleorder array we are on
 let money = 0; //party $$
 
 //declare party members
-let protag = new partyMember('', 3, 'hS', 6, 6, 6);
-let joseph = new partyMember('Joseph', 4, 'fS', 4, 7, 4);
+let protag = new partyMember('', 3, 'hS', 6, 6, 6, 'protag');
+let joseph = new partyMember('Joseph', 4, 'fS', 4, 7, 4, 'joseph');
 
 //initial equipment and abilities for joseph
 joseph.abilityList.agi = abilityList.agi;

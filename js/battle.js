@@ -268,6 +268,8 @@ function attackEnemy(target, type, skill) { //an action has been selected, and n
           `);
         nextTurn(); // next persons turn
       }, 1000); //1s delay on damage draw.
+      setTimeout(function() {$('#battle-damage-text' + target).html(``);}, 2000); //2s delay on clear
+
       break;
 
     case 'physskill': //start with a check if they have enough HP to use the skill
@@ -746,8 +748,8 @@ function nextTurn() {
 
         $('.result-top').append(`
           <h2 class="game game-over-text">${e.name} has reached level ${e.level + 1}!</h2>
-          <h3 class="game">HP: +${HPBonus}, max is now ${e.maxHP}</h3>
-          <h3 class="game">MP: +${MPBonus}, max is now ${e.maxMP}</h3>
+          <h3 class="game">HP: +${HPBonus}, max is now ${e.maxHP + HPBonus}</h3>
+          <h3 class="game">MP: +${MPBonus}, max is now ${e.maxMP + MPBonus}</h3>
           `);
         if(strBonus>0) {$('.result-top').append(`<h3 class="game">Str: +${strBonus}</h3>`);}
         if(magBonus>0) {$('.result-top').append(`<h3 class="game">Mag: +${magBonus}</h3>`);}
@@ -759,6 +761,11 @@ function nextTurn() {
         e.ag+=agBonus;
         e.maxHP+=HPBonus;
         e.maxMP+=MPBonus;
+
+        if(e.skillGrowth[e.level] != undefined) {
+          $('.result-top').append(`<h2 class="game">${e.name} learned ${e.skillGrowth[e.level].name}!!</h2>`)
+          e.abilityList.push(e.skillGrowth[e.level]);
+        }
       } else {
         e.xp+=totalXP;
       }
@@ -883,7 +890,7 @@ function enemyTurnResult(type, target, skill) {
             `);
           nextTurn(); // next persons turn
         }, 1000); //1s delay on damage draw.
-        setTimeout(function() {$('#battle-damage-text' + e2p(currentTurn)).html(``);}, 2000);
+        setTimeout(function() {$('#battle-damage-text' + e2p(currentTurn)).html(` `);}, 2000);
         break;
       } //end mp check
 

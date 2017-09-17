@@ -1,7 +1,8 @@
 /*jshint esversion: 6 */
 
-function partyMember(name, level, resist, str, mag, ag) { //constructor for party members
+function partyMember(name, level, resist, str, mag, ag, label) { //constructor for party members
   this.name = name;
+  this.label = label;
   this.level = level;
   this.str = str;
   this.mag = mag;
@@ -20,6 +21,7 @@ function partyMember(name, level, resist, str, mag, ag) { //constructor for part
   this.abilityList = {};
   this.xp = xpChart[level];
   this.usedGuard = false;
+  this.skillGrowth = skillGrowthChart[this.label];
 
 } //end partyMember constructor
 
@@ -33,6 +35,16 @@ let xpChart = {
   7: 1500
 
 }
+
+let skillGrowthChart = {
+  'protag' : {
+    4: 'zio'
+  },//end protag
+  joseph : {
+    7: 'eiga'
+  }//end joseph
+}; //end obj
+
 
 let inventory = {
   weapons : {
