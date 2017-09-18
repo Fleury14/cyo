@@ -854,6 +854,18 @@ function drawStatus(member) { //function to fill in the status box with the resp
     `);
 }
 
+function drawNewLifeBar() { //functiono to redraw life bar out of battle with partys HP and MP
+  if($('#life-bar-box').hasClass('col-sm-4') == true) {
+    $('#life-bar-box').removeClass('col-sm-4 col-sm-offset-4');
+    $('life-bar-box').addClass('col-sm-8 col-sm-offset-2');
+  }
+
+  $('.life-box').html(``); //clear current lifeBar
+  for (let i=0; i<party.length; i++) { //for loop to go through party members, could probably use forEach here
+   $('.life-box').append(`<p class="game text-center">${party[i].name} - HP: ${party[i].currentHP}/${party[i].maxHP} MP: ${party[i].currentMP}/${party[i].maxMP}</p>`);
+ } //end for
+} //end drawNewLifeBar
+
 function section200() { //begin chapter two
   clearScreen();
   $('#ch2Skip').detach();
@@ -885,7 +897,7 @@ function section200() { //begin chapter two
 
 function section201() { //initial battle test
   //declare monsters for fight
-  gameSound.bgm.willPower.play();
+  gameSound.bgm.lifeWillChange.play();
   $('.result-bottom').html(`<button class="btn btn-info battle-over-button game">Continue</button>`);
   document.querySelector('.result-bottom').addEventListener('click', section202);
   beginBattleEngine([enemyUkobach]);
@@ -897,8 +909,9 @@ function section202() { //battle complete
   document.querySelector('#battleBox').classList.add('hide-battle');
   document.querySelector('.result-bottom').removeEventListener('click', section202);
   clearScreen();
+  drawNewLifeBar();
   appendOutputConsole('p', 'You see two more of the same type of shadow coming at you. After the previous fight, you are now bristing with confidence, feeling like you can take on 10 enemies at once. You look over to Joseph quickly and notice a shocked expression on his face. You can\'t help but to grin in anticipation of the next fight...');
-  appendOutputConsole('div', '<button class="btn btn-info flex-container justify-center" id="to203">Continue</button>');
+  appendOutputConsole('div', '<button class="btn btn-info" id="to203">Continue</button>', ' flex-container justify-center');
   document.querySelector('#to203').addEventListener('click', section203);
 }
 
@@ -914,18 +927,30 @@ function section204() { //battle 2 complete
   document.querySelector('#battleBox').classList.add('hide-battle');
   document.querySelector('.result-bottom').removeEventListener('click', section204);
   clearScreen();
+  drawNewLifeBar();
   appendOutputConsole('p', 'After defeating the previous two shadows, you see two more accompanied by the same bigger shadow you encountered before. This time, however, it does not have a shield that is rotating in color. Still on a high from the last battle, you prepare to take on all three when Joseph, sword in hand, walks beside you. He mentions something about your abilities, but you can hardly hear him in anticipation of the next fight. Regardless, it looks like he\'s here to help');
-  appendOutputConsole('div', '<button class="btn btn-info flex-container justify-center" id="to205">Continue</button>');
+  appendOutputConsole('div', '<button class="btn btn-info" id="to205">Continue</button>', 'flex-container justify-center');
   document.querySelector('#to205').addEventListener('click', section205);
 }
 
 function section205() { //battle 3, 2v3
+  gameSound.bgm.lifeWillChange.pause();
+  gameSound.bgm.willPower.play();
   document.querySelector('.result-bottom').addEventListener('click', section206);
-  party.push(joseph);
+  party.push(joseph); //add joseph to the party
   beginBattleEngine([enemyUkobach, enemyBerith, enemyUkobach2]);
 
 }
 
 function section206() {//battle complete
+  document.querySelector('#resultCont').classList.add('hide-battle');
+  document.querySelector('#battleBox').classList.add('hide-battle');
+  gameSound.bgm.willPower.pause();
   clearScreen();
+  drawNewLifeBar();
+  $(gameConsole).append(`
+    <p>After the latest battle, you start to gather yourself a little more. You look over to Joseph who gives you a nod of approval. You have so many questions to ask: What are these abilities? How did you get them? What is this place that you are in? Where did the enemies come from? Before you can form a question, Joseph speaks up and says, "I know you have a lot of question. We have much to discuss. But for now, let us get out of here. You have a lot of work ahead of you."</p>
+    <p>If there was one thing from this whole order that rang true, it was that last sentence. There will indeed be a lot of work to do...</p>
+    <p class="game text-center text-uppercase">To be continued...</p>
+    `);//end append
 }

@@ -85,7 +85,6 @@ let commandBox = function(e){
     drawArrow();
   }
   if(e.key == 'Enter') { //if they press enter...
-    gameSound.sfx.beep.play();
     switch(currentArrow) { //check and see what the arrow is currently set to and execute the appropriate alert
       case 0:
         playerFightTarget('wpnatk');
@@ -166,6 +165,7 @@ function partySkillUse(skill, target) {
 // physskill magskill -- skills of a physical or magic variety
 function playerFightTarget(type, skill) { // function to select a target
   //console.log(type);
+  gameSound.sfx.beep.play();
   if(this.id=='commandRow0') {type = 'wpnatk';} // since values cant pe passed in event listeners without activating it, use 'this' to determine which row was selected therefore the attack type
   window.removeEventListener('keydown', commandBox); //remove keyboard commands for command box
   $('.description-box').html(`
@@ -605,6 +605,7 @@ function getBattleOrder(enemies) {
 } //end function getbattleorder
 
 function useItem() { //function when player selects item from the command list
+ gameSound.sfx.beep.play();
  $(inventoryBox).html(`Click on an item to select it`);
  let inventoryBoxId = 0;
  inventoryBox.classList.remove('hide-inventory');
@@ -657,6 +658,7 @@ function selectItem(event) { //after a user clicks on an item, the appropriate a
 } //end selectItem
 
 function useSkill() { //player selected skill on the command menu. we will use the inventory box for this.
+  gameSound.sfx.beep.play();
   $(inventoryBox).html(`<p class="text-warning">Click on an item to select it</p>`); // clear inventory box and add header
   let skillBoxId = 0;
   inventoryBox.classList.remove('hide-inventory');
@@ -897,7 +899,7 @@ function enemyTurnResult(type, target, skill) {
         } else {
           resistMod = 1; //no change
         }
-        console.log(`level ${level}, mag ${mag}, skillpow ${skillPow}, def ${def}`);
+        console.log(`level ${level}, skillpow ${skillPow}, def ${def}`);
         damage = 6 * Math.sqrt(level * (str * 3 - def) ) * damageMod * resistMod * skillPow * critMod;
 
         if(party[target].usedGuard==true) {damage*=0.5;} //check to see if target is defending
@@ -972,6 +974,7 @@ function e2p(order) { // this function converts the negative number used in batt
 }
 
 function playerGuard() { //player takes a defensive stance forfeiting action in favor of damage mitigation (50%)
+  gameSound.sfx.beep.play();
   $('.description-box').html(`${party[currentTurn].name} takes a defensive stance. All incoming damage will be halved.`);
   party[currentTurn].usedGuard = true;
   setTimeout(function() {nextTurn();}, 1500);
