@@ -49,7 +49,7 @@ let gameSound = {
   bgm : {
     villain :  new Audio('sound/villain.mp3'),
     willPower : new Audio('sound/willpower.mp3'),
-    lifeWillChange : new Audio('sound/lifeWillChange.mp3')
+    lifeWillChange : new Audio('sound/lifewillchange.mp3')
   },
   sfx : {
     crit : new Audio('sound/persona5-crit.wav'),
