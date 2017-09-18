@@ -58,15 +58,15 @@ Declaring a battle begins with calling beginBattleEngine with an array of enemie
           |                |             -------------    -----------   |
           |                |             | SelectItem |  |selectSkill|  |
           |                |              ------------    -----------   |
-          |                 \                  |           |            |
-          |                   ----------------------------------        |
-          |                  | Targeting mechanic:             |        |
-          |                  | playerFightTarget or            |        |
-          |                  | partySelectTarget               |        |
-          |                   ---------------------------------         |
-          |                     |                      |                |
-          |              ---------------         ---------------        |
-          |             | attackEnemy  |        | partySkillUse |       |
+          |               /                    |           |            |
+          |              /    ----------------------------------        |
+          |             /    | Targeting mechanic:             |        |
+          |            /     | playerFightTarget or            |        |
+          |           /      | partySelectTarget               |        |
+          |          /        ---------------------------------         |
+          |         /           |                      |                |
+          |         |    ---------------         ---------------        |
+          |         |-->| attackEnemy  |        | partySkillUse |       |
           |              ---------------         ---------------        |
           |                       \             /                      /
            \                      ---------------                     /
@@ -88,8 +88,27 @@ battlePlayerTurn: At the start of a players turn, the commandBox appears listing
 
 playerGuard: The easiest one to explain, said party member takes a defensive stance halving incoming damage. The guard flag in the players object is activated, and nextTurn is called.
 
-playerFightTarget: The player executes a basic weapon attack. This immediately calls the targeting mechanic which is explained further below.
 
 useItem: Party member uses an item from the inventory. This un-hides the inventory box, and draws all battle items owned by the party. It gives each box a class name that matches up with the item's name in the inventory list. This will prove important later. A listener is attached to each row and the event calls selectItem. The cancel button will call cancelItem which simply hides the inventory box and gives the player control of the command box again.
 
-selectItem: This function goes through the passed event, finds the class name and matches it up with the inventory object to figure out which item was used. 
+selectItem: This function goes through the passed event, finds the class name and matches it up with the inventory object to figure out which item was used. The item is then switch/cased to figure out the exact effect and the respective targeting mechanic is called. As of right now, there are no items that target the party, but there will be in the future.
+
+useSkill: A similar mechanic to the useItem, this draws a list of skills in the inventory box, and allows the player to pick one or cancel. Cancel also calls the cancelItem function which works because the same inventory box is used to draw the skill list. In order to explain each skill thoroughly, the corresponing ability is parsed through the abilityList and the element, cost, and description of the skill is displayed. Because the list display is more complex, I couldn't pass a single class name over, although upon thinking about it I could have used jquery to check, but instead I assigned the ability name to be passed in the 'title' part of the element. Listeners are attached to each row and selectSkill is called upon click.
+
+selectSkill: Just like select item, this goes through the event to get the skill name and then matches it up to the ability list to figure the next course of action. The main difference is that instead of using the class of the element, it uses the title. The corresponsing targeting mechanic is used depending on the element of the skill. If its 'heal' then it selects a party member, otherwise it selects an enemy.
+
+playerFightTarget: The targeting mechanic for selecting an enemy. The type of attack, and skill if applicable, is retained all the way through. Once a target is selected, the aforementioned type and skill are passed along with the target. At the moment I have decided to not prevent the player from selecting a dead target. This essentially forfeits the players turn. I may change that in the future. Once an enemy is targets, attackEnemy is called to parse the damage result.
+
+partySelectTarget: This functions the same as the enemy targeting system, only this selects a party member. This is used for healing skills, and in the future, items. Once a target is selected, playerSkillUse is called.
+
+playerSkillUse: This takes in the target and the skill used, and executes the correct command based on the skill passed. In this case, the only event is the healing skill 'dia' which executes a heal based on the power of the skill and the magic stat of the user. HP is updated, health is redrawn, and nextTurn is called.
+
+attackEnemy: Now that we have the type, target, and skill, we can call the respective damage formula and apply the damage. The type is switch/cased, 'wpnatk' calling the basic wepaon attack formula, physskill also caling the weapon formula but applying a bonus% based on the skills power, and 'magskill' dealing damage based on the power of the skill used and the user's magic stat. After the damage is calculated, it is redrawn and nextTurn is called. Much like the enemyTurnResult function, there is a small timeout set to display the damage for effect.
+
+nextTurn: This is called when a turn is over. It immediately checks to make sure either the party isnt all dead, then the enemies aren't all dead, and if so, displays either the game over screen, or victory screen. The XP/money gain, and the check for levelling up is also done in this function, but that may change at a later date. If there isn't a victor decided, the next iteration of the battleOrder array is called, the currentTurn is set to whoever's turn is up, and based on that being an enemy or a partymember, the whole thing starts again.
+
+NOTABLE SIDE FUNCTIONS:
+
+getBattleOrder: This orders the enemies and party members based on their agility stat and sorts them in an array. 0-3 are partyMember[0] through [3]. In order to properly denote which enemy, the currentEnemies index is incremented by one, and then multiplied by -1. Therefore in the order array, enemy[0] would be -1, enemy[1] would be -2, and so on. This way, when we want to check to see if an enemy or player is up, we simply see if currentTurn is less than 0.
+
+e2p: Because currentTurn is set to a negative number in the order array, if we want to act on the respective enemy, we need to revert that number back to the correct index in the currentEnemies array. The e2p function does exactly that. Therefore, if we need the current enemies strength stats, since currentTurn is negative, we simply call currentEnemies[e2p(currentTurn)]. Neato.
