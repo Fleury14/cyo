@@ -13,6 +13,7 @@
 body {
   margin: 0;
   background-color: #000;
+  overflow: hidden;
 }
 
 .invisible {
@@ -31,6 +32,10 @@ body {
   justify-content: center;
 }
 
+.align-center {
+  align-items: center;
+}
+
 .game {
   font-family: 'Game';
 }
@@ -41,6 +46,10 @@ body {
 
 .auto-center {
   margin: 0 auto;
+}
+
+.green-text {
+  color: #00ff00;
 }
 
 /* End Global, Begin header styles */
@@ -115,7 +124,15 @@ body {
   background-color: #666;
 }
 
-/* End bottom styles */
+/* End middle styles */
+
+/* Styles for EVENTS */
+
+.boss-shield {
+  font-size: 4em;
+}
+
+/* End event styles */
 
 /* Begin dialogue box */
 
@@ -155,7 +172,6 @@ body {
 /* begin blacken box. this is used to hide the console when dialogue is posted */
 
 .blacken-box {
-  height: 100vh;
   width: 100%;
   position: absolute;
   background-color: rgba(0, 0, 0, 0);
@@ -175,7 +191,7 @@ body {
 
 .inventory-box {
   width: 80%;
-
+  z-index: 3;
   background-color: #000;
   border: 2px solid yellow;
   color: #fff;
@@ -185,13 +201,57 @@ body {
   top: 250px;
   left: 10%;
   transition: 0.25s all;
+  padding: 20px;
 }
 
 .hide-inventory {
   transform: translateX(115%);
+  display: none;
+}
+
+#skillList { /* The skill list from the command menu, located in script.js */
+  width: 100%;
+}
+
+.skill-list {
+  border-top: 1px solid #444;
+}
+
+.skill-cancel-button {
+  margin-top: 20px;
 }
 
 /* End inventory */
+
+/* begin status window*/
+
+#status-box {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #00ff00;
+  position: absolute;
+  left: 0;
+  z-index: 4;
+  transition: 0.5s all;
+  background-color: #112211;
+  color: #fff;
+}
+
+#status-left-box, #status-right-box {
+  flex-direction: column;
+  align-items: center;
+}
+
+.show-status {
+  top: 0;
+
+}
+
+.hide-status {
+  top: -100%;
+}
+
+/* end status window */
 
 /* behin lookin cool joker! */
 
@@ -210,6 +270,7 @@ body {
 
 .hide-joker {
   transform: translate(100%, -50%);
+  display: none;
 }
 
 .done-joker {
@@ -219,3 +280,146 @@ body {
 .no-transition {
   transition: 0s all;
 }
+
+/* End joker looking cool */
+
+/* Begin battle box */
+
+.battle-box {
+  width: 80%;
+  height: 90vh;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 10%;
+  transition: 0.5s all;
+  border: 1px solid #fff;
+  background-color: #222;
+}
+
+.result-box {
+  width: 80%;
+  height: 90vh;
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  left: 10%;
+  transition: 0.5s all;
+  border: 1px solid #fff;
+  background-color: #222;
+}
+
+.result-top {
+  height: 70vh;
+  width: 100%;
+  flex-direction: column;
+  color: #fff;
+}
+
+.result-bottom {
+  height: 20vh;
+  width: 100%;
+
+}
+
+.hide-battle {
+  left: -80%;
+}
+
+
+
+.party-member-box {
+  height: 25vh;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 5px;
+}
+
+.enemy-container {
+  height: 40vh;
+  color: #fff;
+  justify-content: space-around;
+  flex-direction: column;
+  align-items: center;
+}
+
+.enemy-container p {
+  margin: 0;
+}
+
+.current-turn-border {
+  border: 4px dotted #ffff00;
+}
+
+.action-box, .description-box {
+  height: 23vh;
+  background-color: #000;
+  border: 1px solid #fff;
+  border-radius: 5%;
+}
+
+.action-box {
+  padding-top: 10px;
+}
+
+.description-box {
+  color: #fff;
+  padding-top: 5px;
+}
+
+.action-row {
+  height: calc(23vh/4);
+  color: #fff;
+
+}
+
+.arrow-box {
+  height: calc(23vh/4);
+  width: 50px;
+  float: left;
+}
+
+.attack-target-box {
+  border: 2px dotted dodgerblue;
+  padding: 5px;
+}
+
+.game-over-text {
+  color: #fff;
+}
+
+.battle-over-button {
+  height: 50px;
+  padding: 10px;
+  color: #000;
+}
+
+/* icon styles */
+
+.wind-icon {
+  color: #186d27;
+}
+
+.lightning-icon {
+  color: #fcf937;
+ }
+
+.fire-icon {
+  color: #f47d42;
+ }
+
+.ice-icon {
+  color: #013896;
+}
+
+.darkness-icon {
+  color: #555555;
+ }
+
+.physical-icon {
+  color: #a30000;
+ }
+
+ .heal-icon {
+  color: #76f400;
+ }

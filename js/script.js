@@ -15,6 +15,14 @@ const blackBox = document.getElementById('blackBox');
 const inventoryButton = document.getElementById('inventoryButton');
 const inventoryBox = document.getElementById('inventoryBox');
 const jokerBox = document.getElementById('jokerBox');
+const battleBox = document.querySelector('#battleBox');
+const leftButtonArea = document.getElementById('left-button-area');
+const bossBGM = new Audio('sound/villain.mp3');
+const willpowerBGM = new Audio('sound/willpower.mp3');
+const statusButton = document.querySelector('#status-button');
+const statusBox = document.querySelector('#status-box');
+let musicControl = ''; // will be used for audio button once drawn
+
 let consoleButtonRow = ''; // cant use getelement becuase it hasnt been created yet, but declaring up here to avoid multipole declarations
 let playerName = ''; // players name
 
@@ -23,15 +31,62 @@ let insertedElement = '';
 let elementTarget = '';
 let outputText = '';
 
+let enableMusic = true; // In case i want to turn off music
 let dialogueTime = ''; //used as set interval later
 let dialogueFlag = -1; //used to keep track of conversation steps
 let needClear = true; //used to avoid two straight dialogue draws
 let dialogueCont = false; // used for the continue button in long conversation
 let dialogueShown = false; // used to determine if a dialogue has been drawn in conversations
 
+//CHAPTER 2 var declarations
+let party = [];
+let currentEnemies=[];
+let initialBattleDraw = true; //tells the function for drawing enemies if containers need to either be drawn initially, or reset in the battle box
+let battleOrder = [];
+let currentTurn = 0; //determines whose turn i t is in battle
+let battleTurn = 0; //determins which part of the battleorder array we are on
+let money = 0; //party $$
 
+//declare party members
+let protag = new partyMember('', 3, 'hS', 6, 6, 6, 'protag');
+let joseph = new partyMember('Joseph', 4, 'fS', 4, 7, 4, 'joseph');
+
+//initial equipment and abilities for joseph
+joseph.abilityList.agi = abilityList.agi;
+joseph.abilityList.bufu = abilityList.bufu;
+joseph.weaponObj = 'ironSword';
+joseph.armorObj = 'plainClothes';
+joseph.currentWeapon = inventory.weapons[joseph.weaponObj].name;
+joseph.currentArmor = inventory.armor[joseph.armorObj].name;
+joseph.weaponPwr = inventory.weapons[joseph.weaponObj].attackPow;
+joseph.armorPwr = inventory.armor[joseph.armorObj].armorPow;
+//declare enemies
+let enemyUkobach = new enemy('Ukobach', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2, 50, 5);
+let enemyUkobach2 = new enemy('Ukobach 2', 75, 50, 'fSiW', [abilityList.agi], 2, 3, 2, ukobachAI, 2, 50, 5);
+let enemyBerith = new enemy('Berith', 150, 30, 'wSfW', [abilityList.strongStrike, abilityList.garu], 4, 4, 3, berithAI, 4, 120, 8 );
+
+
+
+
+
+
+
+battleBox.style.display = 'none';
 document.getElementById('intro-button').addEventListener('click', beginGame);
 document.getElementById('intro-button').addEventListener('touchstart', beginGame);
+inventoryButton.addEventListener('click', showInventory);
+document.querySelector('#ch2Skip').addEventListener('click', function() {
+  inventory.battleItems.fireBottle.numOwned = 3;
+  inventory.battleItems.freezeSpray.numOwned = 3;
+  inventory.battleItems.airCannon.numOwned = 3;
+  inventory.battleItems.stunGun.numOwned = 3;
+  inventoryButton.removeEventListener('click', showInventory);
+  inventoryButton.classList.remove('invisible');
+  inventoryButton.addEventListener('click', showNewInventory);
+  statusButton.classList.remove('invisible');
+  statusButton.addEventListener('click', showPartyStatus);
+  section200();
+});
 
 drawHealthBar();
 
@@ -120,31 +175,33 @@ function decision11A() {
 
 function decision11B() {
   playerName = prompt('Please input your name:'); // Get players name
+  playerName = '' ? prompt('I don\'t know anyone without a name. If you are not willing to disclose yours, I cannot help you') : alert('Name recieved');
   drawHealthBar(); //redraw healthbar with name
   dialogueFlag = 0; // initiate conversation chain
   gameConsole.innerHTML = ''; //clear screen
 
 
   console.log('interval set');
-  dialogueTime = setInterval( dial11B, 250);
+  dialogueTime = setInterval( dial11B, 250); // Interval time to check for input. Lowering increases response time, but will strain the browser
 
   function dial11B() { //dialogue chain start
 
 
-    switch(dialogueFlag) {
+    switch(dialogueFlag) { // Dialogue chain structure:
+      // Dialogue is checked every .25 seconds for a response
 
       case 0:
         console.log(dialogueCont);
-        if(dialogueShown == false) {
+        if(dialogueShown == false) { //  if the current dialogue hasn't been shown yet, show it
           dialogueText('"Teacher"' , 'Excellent. Now listen carefully. This room that you are in exists outside of normal space. It is a physical manifestation of your own consciousness. For some people it can be an elevator, for others a jail cell. In your case, since you are, and will be, constantly learning, this is a classroom. I am here to help you out of your current plight, but I only offer the tools to do so. The correct decisions will still need to be made by you.');
-          dialogueShown = true; }
+          dialogueShown = true; } // and then change the flag so the same dialogue doesnt get redisplayed over and over
 
-        if(dialogueCont == true) {
+        if(dialogueCont == true) { // clicking the continue button makes this flag true so this code executes if the person clicked the button
           console.log('true flag tripped');
-          dialogueFlag++;
-          dialogueShown = false;
+          dialogueFlag++; // increment the dialogue flag so it goes to the next case
+          dialogueShown = false; //reset flags
           dialogueCont = false;
-          needClear = false;
+          needClear = false; //notify if the next dialogue section will require the console text to be blacked out
         } //end if
         break; //break case 0
 
@@ -442,16 +499,53 @@ function decision35() { // enncounter success, prelude to boss fight
 
 function decision36() { // begin boss fight
 /* Boss fight mechanics: Boss will start with 3 health. Each round, its shield wil glow a color corresponding to an element. If the player picked the opposite color, he will do damage. If picks the same color, he will take damage. Anything else will have no effect */
+// The biggest challenge in this mechanic actually comes from not running out of items. It is possible to get bad RNG and force yourself to take damage to change the bosses afinity
+
   gameConsole.innerHTML='';
+
+  if(enableMusic == true) {
+    gameSound.bgm.villain.play(); // play boss music
+    insertedElement = document.createElement('button');
+    insertedElement.setAttribute('onclick', 'muteMusic()');
+    insertedElement.setAttribute('id', 'musicControl');
+    insertedElement.setAttribute('class', 'btn btn-info btn-block');
+    insertedElement.innerHTML = '<i class="fa fa-volume-off" aria-hidden="true"></i>';
+    leftButtonArea.appendChild(insertedElement);
+  }
+
   appendOutputConsole('p', '*Boss Fight*', 'text-center game');
   appendOutputConsole('h1', 'BERITH', 'text-center game');
-  appendOutputConsole('p', 'Health: ' + bossHealth, 'text-center');
+
+  let bossHealthBar = ''; // put a string together of hearts for boss health
+  for(let i=0; i<bossHealth; i++){
+    bossHealthBar += '<i class="fa fa-heart" aria-hidden="true"></i>';
+  }
+
+  let shieldColor = '';
+  switch (currAffinity) { // use the boss's affinity to determine the color of the shield being drawn
+    case 0:
+      shieldColor = 'text-danger';
+      break;
+    case 1:
+      shieldColor = 'text-info';
+      break;
+    case 2:
+      shieldColor = 'text-success';
+      break;
+    case 3:
+      shieldColor = 'text-warning';
+      break;
+  } // end switch
+  // draw shield with the color that he is strong against
+  appendOutputConsole('p', '<i class="fa fa-shield" aria-hidden="true"></i>', 'text-center boss-shield ' + shieldColor);
+
+  appendOutputConsole('p', 'Health: ' + bossHealthBar, 'game text-center');
   appendOutputConsole('p', 'This time, the shadow turns into a knight atop a floating horse, armed with a spear and shield. Of particular note is its shield: It is glowing a distinct color and you feel like this is going to be the key to the battle. You look over your inventory one last time and harden your resolve. One of you is walking away from this. ');
 
-  currAffinity = Math.floor(Math.random() * 4);
+  currAffinity = Math.floor(Math.random() * 4); //determine bosses affinity.
   appendOutputConsole('p', 'The knight\'s shield is glowing ' + bossAffinity[currAffinity]);
   appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
-  appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+  appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
 } // end f36
 
 function decision41(item) { // Player used item, check affinity for result and redraw
@@ -468,7 +562,9 @@ function decision41(item) { // Player used item, check affinity for result and r
     appendOutputConsole('p', 'Boss is strong against this element!');
     appendOutputConsole('p', '-1 HEALTH', 'text-center game');
     appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
-    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    if(elemInv[0][1] + elemInv[1][1] + elemInv[2][1] + elemInv[3][1] == 0) { decision44(); return; }
+
 
   } else if ( (item == 0 && currAffinity == 1) || (item == 1 && currAffinity == 0) || (item == 2 && currAffinity == 3) || (item == 3 && currAffinity == 2) ) { // since opposite pairings are 0-2 and 1-3, we can just use remainder2 operator to check
     bossHealth--;
@@ -478,24 +574,50 @@ function decision41(item) { // Player used item, check affinity for result and r
     appendOutputConsole('p', 'You exploited a weakness and did some damage! But something is now different...');
     appendOutputConsole('p', 'The knight\'s shield is now glowing ' + bossAffinity[currAffinity]);
     appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
-    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    if(elemInv[0][1] + elemInv[1][1] + elemInv[2][1] + elemInv[3][1] == 0) { decision44(); return; }
+
   } else {
     decision41A();
     appendOutputConsole('p', 'The item had no effect. Try something else.');
     appendOutputConsole('p', 'The knight\'s shield is glowing ' + bossAffinity[currAffinity]);
     appendOutputConsole('div', '<button class="btn btn-danger" onclick="decision41(0)">Use fire bottle</button><button class="btn btn-primary" onclick="decision41(1)">Use freeze spray</button>', 'flex-container justify-space-around');
-    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-info" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    appendOutputConsole('div', '<button class="btn btn-success" onclick="decision41(2)">Use Air Cannon</button><button class="btn btn-warning" onclick="decision41(3)">Use Stun Gun</button>', 'flex-container justify-space-around');
+    if(elemInv[0][1] + elemInv[1][1] + elemInv[2][1] + elemInv[3][1] == 0) { decision44(); return; }
+
   } // end iff
 } //end f41
 
 function decision41A() { //boss redraw
 // check if player is out of items
-if(elemInv[0] + elemInv[1] + elemInv[2] + elemInv[3] == 0) { decision44(); }
 
   gameConsole.innerHTML='';
   appendOutputConsole('p', '*Boss Fight*', 'text-center game');
   appendOutputConsole('h1', 'BERITH', 'text-center game');
-  appendOutputConsole('p', 'Health: ' + bossHealth, 'text-center');
+  let bossHealthBar = '';
+  for(let i=0; i<bossHealth; i++){
+    bossHealthBar += '<i class="fa fa-heart" aria-hidden="true"></i>';
+  } // end for
+
+  let shieldColor = '';
+  switch (currAffinity) { // use the boss's affinity to determine the color of the shield being drawn
+    case 0:
+      shieldColor = 'text-danger';
+      break;
+    case 1:
+      shieldColor = 'text-info';
+      break;
+    case 2:
+      shieldColor = 'text-success';
+      break;
+    case 3:
+      shieldColor = 'text-warning';
+      break;
+  } // end switch
+  // draw shield with the color that he is strong against
+  appendOutputConsole('p', '<i class="fa fa-shield" aria-hidden="true"></i>', 'text-center boss-shield ' + shieldColor);
+
+  appendOutputConsole('p', 'Health: ' + bossHealthBar, 'text-center game');
 } // f41a
 
 function decision42() { // Boss defeated
@@ -508,14 +630,26 @@ function decision42() { // Boss defeated
 
 function decision43() { // encounter mitsuru, end game
   gameConsole.innerHTML='';
-  appendOutputConsole('p', 'You look over to the woman and you are hit with a wave of exhaustion. All these encounters have clearly tired you out, and you cant go much farther. You drop to a knee, and as you do, the woman puts her hands on your shoulders. You look up at her; she has long, brunette hair and appears to be wearing what would appear to be a black battle suit except that on top of it she is wearing an extravagant whit fur coat. There is a fencing sword holstered inside her coat. One look at her face and you can tell she is some kind of leader, as she is exuding confidence and strength. She looks down to you and simply says, "My name is Mitsuru Kirijo, and I\'m going to get you out of here"');
-  appendOutputConsole('p', 'TO BE CONTINUED...', 'text-center game');
+  if(enableMusic == true){ // stop music if its on
+    bossBGM.pause();
+    musicControl = document.getElementById('musicControl');
+    musicControl.classList.add('invisible');
+  }// end if
+
+  appendOutputConsole('p', 'You look over to the woman and you are hit with a wave of exhaustion. All these encounters have clearly tired you out, and you cant go much farther. You drop to a knee, and as you do, the woman puts her hands on your shoulders. You look up at her; she has long, brunette hair and appears to be wearing what would appear to be a black battle suit except that on top of it she is wearing an extravagant whit fur coat. There is a fencing sword holstered inside her coat. One look at her face and you can tell she is some kind of leader, as she is exuding confidence and strength. However, all that strength seems to leave her at once, as her face turns pale and she loses consciousnes.');
+  appendOutputConsole('div', '<button class="btn btn-primary" onclick="section200()">Continue</button>', 'flex-container justify-center');
 }
 
 function decision44() { //player ran out of items -- game over
 gameConsole.innerHTML = '';
 appendOutputConsole('p', 'You no longer have any items with which to fight the boss. As he approached you to attack, you are completely defenseless...');
 appendOutputConsole('p', '** GAME OVER ** ', 'game text-center');
+}
+
+function decision45() { //continuing transition to ch 2
+
+
+
 }
 
 // fucntion for outputting to conosle
@@ -568,7 +702,11 @@ function pauseClick() {
 
 function showInventory() {
 
-  if (!(inventoryBox.classList.contains('hide-inventory'))) { return;}
+  if (!(inventoryBox.classList.contains('hide-inventory'))) {
+    inventoryBox.classList.add('hide-inventory');
+    inventoryBox.innerHTML = '';
+    return;
+  }
 
   inventoryBox.classList.remove('hide-inventory');
   elemInv.forEach( function(item, index) {
@@ -583,14 +721,37 @@ function showInventory() {
 
 }// end show inventory
 
+function showNewInventory() { //function to display new inventory object
+
+  if (!(inventoryBox.classList.contains('hide-inventory'))) {
+    inventoryBox.classList.add('hide-inventory');
+    inventoryBox.innerHTML = '';
+    return;
+  }
+
+  inventoryBox.classList.remove('hide-inventory');
+  for (let item in inventory.battleItems) { //go through all battle items
+    console.log(item.numOwned);
+    if(inventory.battleItems[item].numOwned>0){ //make sure they have said item
+      $(inventoryBox).append(`<p>${inventory.battleItems[item].name} : ${inventory.battleItems[item].numOwned}</p>`);
+    } //end if
+  } // end for..in
+
+  insertedElement = document.createElement('div');
+  insertedElement.innerHTML = '<button class="btn btn-warning flex-container justify-center dos" onclick="hideInventory()">Hide Inventory</button>';
+  inventoryBox.appendChild(insertedElement); // draw hide inv button
+
+}// end show inventory
+
 function hideInventory() {
+  gameSound.sfx.cursorCancel.play();
   inventoryBox.classList.add('hide-inventory'); //shift box over
   let inventoryDelay = setTimeout(function() {inventoryBox.innerHTML = '';}, 250); // empty content
 }
 
 function critAnimation() {
   let critSound = new Audio('sound/persona5-crit.wav');
-  critSound.play();
+  gameSound.sfx.crit.play();
   jokerBox.classList.remove('hide-joker');
   setTimeout(function() {jokerBox.classList.add('done-joker');}, 1000);
   setTimeout(function() {jokerBox.classList.add('no-transition');}, 1020);
@@ -599,19 +760,197 @@ function critAnimation() {
   setTimeout(function() {jokerBox.classList.remove('no-transition');}, 1080);
 }
 
-function inventoryCheck(invArr, item) {
-  if(invArr[item][1] === 0) {
+function inventoryCheck(invArr, item) { // makes sure that player has the item in question
+
+  let checkResult = invArr[item][1] == 0 ? true : false; // is the item count 0? (t/f)
+
+  if(checkResult) { // return false is they didnt posses the item, otherwise return true
     appendOutputConsole('p', 'You dont have any more of that item!', 'text-center dos');
     return false;}
   else {return true;}
 }
 
-function healthBonus() {
+function healthBonus() { // give the player 1 extra health provided they dont go above 4
   if (playerHealth < 4) {
     appendOutputConsole('p', 'After the monster disappears, a clear plastic bottle drops to the ground. How and why a monster like that was carrying a plastic bottle is mind-boggling, but as you go to pick it up, it emits an absolutely delicious scent. You can\'t help but to drink it immediately, and after doing so, you feel even stronger than before');
     playerHealth++;
-    console.log('ph:', playerHealth);
     drawHealthBar();
     appendOutputConsole('p', '+1 HEALTH', 'game flex-container justify-center');
   }
+}
+
+function muteMusic() { // functionality for the mute button
+
+  // enableMusic == true ? (
+  //   bossBGM.pause(),
+  //   enableMusic = false
+  // ) : (
+  //   bossBGM.play(),
+  //   enableMusic = true
+  // );
+  // This shows i can use ternary operators, but it gives a linter error
+
+  if(enableMusic==true) {
+    gameSound.bgm.villain.pause();
+    enableMusic = false;
+  } else {
+    gameSound.bgm.villain.play();
+    enableMusic = true;
+  } //end if
+} //end muteMusic
+
+
+// CHAPTER 2 !!!!!!
+
+function clearScreen() { //function to clear screens
+  gameConsole.innerHTML = '';
+  $('.result-top').html(``);
+}
+
+function showBattleScreen() {
+  battleBox.style.display = 'block';
+  battleBox.classList.remove('hide-battle');
+}
+
+function showPartyStatus() { //function to show the status screen
+  statusBox.classList.remove('hide-status');
+  let member = 0;
+  drawStatus(member);
+  document.querySelector('#hide-status-button').addEventListener('click', function() {
+    statusBox.classList.add('hide-status');
+  });
+}
+
+function drawStatus(member) { //function to fill in the status box with the respective values
+  $('#status-name').html(`
+    <h1 class="game">${party[member].name}</h1>
+    `);
+  $('#status-level').html(`
+    <h2 class="game">Level ${party[member].level}</h2>
+    <h4>XP: ${party[member].xp} / ${xpChart[party[member].level + 1]}</h4>
+    `);
+  $('#status-left-box').html(`
+    <h3>HP: ${party[member].currentHP} / ${party[member].maxHP}</h3>
+    <h3>HP: ${party[member].currentMP} / ${party[member].maxMP}</h3>
+    <h3>Strength: ${party[member].str}</h3>
+    <h3>Magic: ${party[member].mag}</h3>
+    <h3>Agility: ${party[member].ag}</h3>
+    `);
+  $('#status-right-box').html(`
+    <div>
+      <h3>Equipped weapon</h3>
+      <h3>${party[member].currentWeapon}</h3>
+      <h3>ATK: ${party[member].weaponPwr}</h3>
+    </div>
+    <div>
+      <h3>Equipped armor:</h3>
+      <h3>${party[member].currentArmor}</h3>
+      <h3>DEF: ${party[member].armorPwr}</h3>
+    </div>
+
+    `);
+  $('#status-button-row').html(`
+    <button id="hide-status-button" class="btn btn-info">Continue</button>
+    `);
+}
+
+function drawNewLifeBar() { //functiono to redraw life bar out of battle with partys HP and MP
+  if($('#life-bar-box').hasClass('col-sm-4') == true) {
+    $('#life-bar-box').removeClass('col-sm-4 col-sm-offset-4');
+    $('life-bar-box').addClass('col-sm-8 col-sm-offset-2');
+  }
+
+  $('.life-box').html(``); //clear current lifeBar
+  for (let i=0; i<party.length; i++) { //for loop to go through party members, could probably use forEach here
+   $('.life-box').append(`<p class="game text-center">${party[i].name} - HP: ${party[i].currentHP}/${party[i].maxHP} MP: ${party[i].currentMP}/${party[i].maxMP}</p>`);
+ } //end for
+} //end drawNewLifeBar
+
+function section200() { //begin chapter two
+  clearScreen();
+  $('#ch2Skip').detach();
+  appendOutputConsole('p', 'A younger man comes out and runs to her aid. He introduces himself as Joseph. Before you can get an explanation, another shadow comes after you. At this point, you\'re no longer exhausted, simply angry that these encounter will not stop. As you steel your resolve, you feel a strage sensation, as if an explosion of energy originated from your heart. You pick up a stray sword left at the womans feet. You seem to recall skills and abilities that you have no business remembering. As you turn to face the shadow, any fatigue from previous encouters is gone. It\'s time to fight. ');
+  appendOutputConsole('p', 'Gained and Equipped -Iron Sword-', 'game text-center');
+  appendOutputConsole('div', '<button class="btn btn-primary" id="continue200">Continue</button>', 'flex-container justify-center');
+  protag.name = playerName; //set the playername in his object, and add him to the party
+  if(protag.name == '') {protag.name = 'Protag';}
+  // give protag basic weapon and armor and equip
+  protag.weaponObj = 'ironSword';
+  protag.armorObj = 'plainClothes';
+  protag.currentWeapon = inventory.weapons[protag.weaponObj].name;
+  protag.currentArmor = inventory.armor[protag.armorObj].name;
+  protag.weaponPwr = inventory.weapons[protag.weaponObj].attackPow;
+  protag.armorPwr = inventory.armor[protag.armorObj].armorPow;
+  //put remaining elemental items from chapter 1 in inventory
+  inventory.battleItems.fireBottle.numOwned += elemInv[0][1];
+  inventory.battleItems.freezeSpray.numOwned += elemInv[1][1];
+  inventory.battleItems.airCannon.numOwned += elemInv[2][1];
+  inventory.battleItems.stunGun.numOwned += elemInv[3][1];
+  //give protag 3 skills (garu, dia, strong strike)
+  protag.abilityList.garu = abilityList.garu;
+  protag.abilityList.dia = abilityList.dia;
+  protag.abilityList.strongStrike = abilityList.strongStrike;
+  party.push(protag);
+
+  document.querySelector('#continue200').addEventListener('click', section201);
+}
+
+function section201() { //initial battle test
+  //declare monsters for fight
+  gameSound.bgm.lifeWillChange.play();
+  $('.result-bottom').html(`<button class="btn btn-info battle-over-button game">Continue</button>`);
+  document.querySelector('.result-bottom').addEventListener('click', section202);
+  beginBattleEngine([enemyUkobach]);
+
+}
+
+function section202() { //battle complete
+  document.querySelector('#resultCont').classList.add('hide-battle');
+  document.querySelector('#battleBox').classList.add('hide-battle');
+  document.querySelector('.result-bottom').removeEventListener('click', section202);
+  clearScreen();
+  drawNewLifeBar();
+  appendOutputConsole('p', 'You see two more of the same type of shadow coming at you. After the previous fight, you are now bristing with confidence, feeling like you can take on 10 enemies at once. You look over to Joseph quickly and notice a shocked expression on his face. You can\'t help but to grin in anticipation of the next fight...');
+  appendOutputConsole('div', '<button class="btn btn-info" id="to203">Continue</button>', ' flex-container justify-center');
+  document.querySelector('#to203').addEventListener('click', section203);
+}
+
+function section203() {//battle 2, 1 vs 2
+document.querySelector('.result-bottom').addEventListener('click', section204);
+document.querySelector('#resultCont').classList.add('hide-battle');
+document.querySelector('#battleBox').classList.add('hide-battle');
+beginBattleEngine([enemyUkobach,enemyUkobach2]);
+}
+
+function section204() { //battle 2 complete
+  document.querySelector('#resultCont').classList.add('hide-battle');
+  document.querySelector('#battleBox').classList.add('hide-battle');
+  document.querySelector('.result-bottom').removeEventListener('click', section204);
+  clearScreen();
+  drawNewLifeBar();
+  appendOutputConsole('p', 'After defeating the previous two shadows, you see two more accompanied by the same bigger shadow you encountered before. This time, however, it does not have a shield that is rotating in color. Still on a high from the last battle, you prepare to take on all three when Joseph, sword in hand, walks beside you. He mentions something about your abilities, but you can hardly hear him in anticipation of the next fight. Regardless, it looks like he\'s here to help');
+  appendOutputConsole('div', '<button class="btn btn-info" id="to205">Continue</button>', 'flex-container justify-center');
+  document.querySelector('#to205').addEventListener('click', section205);
+}
+
+function section205() { //battle 3, 2v3
+  gameSound.bgm.lifeWillChange.pause();
+  gameSound.bgm.willPower.play();
+  document.querySelector('.result-bottom').addEventListener('click', section206);
+  party.push(joseph); //add joseph to the party
+  beginBattleEngine([enemyUkobach, enemyBerith, enemyUkobach2]);
+
+}
+
+function section206() {//battle complete
+  document.querySelector('#resultCont').classList.add('hide-battle');
+  document.querySelector('#battleBox').classList.add('hide-battle');
+  gameSound.bgm.willPower.pause();
+  clearScreen();
+  drawNewLifeBar();
+  $(gameConsole).append(`
+    <p>After the latest battle, you start to gather yourself a little more. You look over to Joseph who gives you a nod of approval. You have so many questions to ask: What are these abilities? How did you get them? What is this place that you are in? Where did the enemies come from? Before you can form a question, Joseph speaks up and says, "I know you have a lot of question. We have much to discuss. But for now, let us get out of here. You have a lot of work ahead of you."</p>
+    <p>If there was one thing from this whole order that rang true, it was that last sentence. There will indeed be a lot of work to do...</p>
+    <p class="game text-center text-uppercase">To be continued...</p>
+    `);//end append
 }
