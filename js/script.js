@@ -175,7 +175,7 @@ function decision11A() {
 
 function decision11B() {
   playerName = prompt('Please input your name:'); // Get players name
-  playerName = '' ? prompt('I don\'t know anyone without a name. If you are not willing to disclose yours, I cannot help you') : alert('Name recieved');
+  playerName == '' ? prompt('I don\'t know anyone without a name. If you are not willing to disclose yours, I cannot help you') : alert('Name recieved');
   drawHealthBar(); //redraw healthbar with name
   dialogueFlag = 0; // initiate conversation chain
   gameConsole.innerHTML = ''; //clear screen
