@@ -289,9 +289,10 @@ body {
 
 .battle-box {
   width: 80%;
-  height: 90vh;
+  height: 100vh;
   z-index: 2;
   position: absolute;
+  padding: 2vh;
   top: 0;
   left: 10%;
   transition: 0.5s all;
@@ -350,7 +351,17 @@ body {
 }
 
 .current-turn-border {
-  border: 4px dotted #ffff00;
+  /* border: 4px dotted #ffff00; */
+  outline: 6px dashed yellow;
+  box-shadow: 0 0 0 6px #222;
+  animation: 0.5s animateBorder infinite;
+}
+
+@keyframes animateBorder {
+  to {
+    outline-color: #222;
+    box-shadow: 0 0 0 6px yellow;
+  }
 }
 
 .action-box, .description-box {
@@ -367,6 +378,9 @@ body {
 .description-box {
   color: #fff;
   padding-top: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .action-row {
@@ -382,8 +396,12 @@ body {
 }
 
 .attack-target-box {
-  border: 2px dotted dodgerblue;
-  padding: 5px;
+  border: 3px ridge navy;
+  padding: 5px 10px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 7px navy;
+  background-color: dodgerblue;
+  margin: 0px 20px;
 }
 
 .game-over-text {
